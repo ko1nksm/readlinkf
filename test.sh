@@ -1,8 +1,16 @@
 #!/bin/sh
 
+set -eu
+
 if [ ! -e /.dockerenv ]; then
-  echo "[ERROR] Do not run outside of Docker." >&2
-  exit 1
+  if ! docker --version >&2; then
+    echo "[ERROR] You need docker to run" >&2
+    exit 1
+  fi
+
+  docker build -t readlinkf ./ >&2
+  docker run --rm readlinkf "./${0##*/}"
+  exit
 fi
 
 . ./readlinkf.sh
@@ -47,9 +55,9 @@ echo "----------------------------------------------------------------------"
 echo
 echo "\`\`\`"
 check() {
-  readlink=$(readlink -f "$1")
-  readlinkf=$(readlinkf "$1")
-  readlinkf_posix=$(readlinkf_posix "$1")
+  readlink=$(readlink -f "$1") &&:
+  readlinkf=$(readlinkf "$1") &&:
+  readlinkf_posix=$(readlinkf_posix "$1") &&:
 
   if [ "$readlink" = "$readlinkf" ] && [ "$readlink" = "$readlinkf_posix" ]; then
     printf '[ok]  %s -> %s\n' "$1" "$readlink"
