@@ -4,6 +4,8 @@ Portable `readlink -f` implementation.
 
 ## readlinkf
 
+Source code: [readlinkf.sh](readlinkf.sh)
+
 ### 1. readlinkf_readlink
 
 Using `readlink` without `-f` option.
