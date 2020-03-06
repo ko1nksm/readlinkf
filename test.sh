@@ -50,9 +50,9 @@ done | {
   ex=0
   while IFS= read -r pathname; do
     set -- "$pathname"
-    link=$($(which readlink) -f "$1")        &&:; set -- "$@" "$link" "$?"
+    link=$($(which readlink) -f "$1") &&:; set -- "$@" "$link" "$?"
     link=$(readlinkf_readlink "$1") &&:; set -- "$@" "$link" "$?"
-    link=$(readlinkf_posix "$1")    &&:; set -- "$@" "$link" "$?"
+    link=$(readlinkf_posix "$1") &&:; set -- "$@" "$link" "$?"
 
     if [ "$2($3)" = "$4($5)" ] && [ "$2($3)" = "$6($7)" ]; then
       printf "\033[32m[pass]\033[m %s -> %s (exit status: %d)\n" "$1" "$2" "$3"
