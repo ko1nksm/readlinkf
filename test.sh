@@ -8,12 +8,15 @@ cd "$(dirname "$0")"
 
 if [ ! -e /.dockerenv ]; then
   docker --version >&2 || abort "[ERROR] You need docker to run"
-  set -- "${1:-sh}" "${2:-Dockerfile}"
-  docker run --rm "$(docker build -q . -f "$2")" "$1" "./${0##*/}"
+  set -- "${1:-sh}" "${2:-Dockerfile}" "${3:-latest}"
+  docker run --rm "$(docker build --build-arg "TAG=$3" -q . -f "$2")" "$1" "./${0##*/}"
   exit
 fi
 
-echo "================ Create files, directories and symlinks ================"
+echo "============================ /etc/os-release ==========================="
+[ -f /etc/os-release ] && cat /etc/os-release
+
+echo "---------------- Create files, directories and symlinks ----------------"
 make_file "/BASE/FILE"
 make_dir  "/BASE/DIR"
 make_link "/BASE/LINK -> FILE"
@@ -33,10 +36,10 @@ make_link "/ROOT -> /"
 make_file "/INCLUDE SPACE/FILE NAME"
 make_link "/INCLUDE SPACE/DIR NAME/SYMBOLIC LINK -> ../FILE NAME"
 
-echo "================================= Tree ================================="
+echo "--------------------------------- Tree ---------------------------------"
 run tree -N --noreport -I "[a-z]*" /
 
-echo "================================= Tests ================================"
+echo "--------------------------------- Tests --------------------------------"
 {
   find / -path "/[A-Z]*"
   echo "/BASE/LINK2/FILE"
@@ -47,7 +50,7 @@ done | {
   ex=0
   while IFS= read -r pathname; do
     set -- "$pathname"
-    link=$(readlink -f "$1")        &&:; set -- "$@" "$link" "$?"
+    link=$($(which readlink) -f "$1")        &&:; set -- "$@" "$link" "$?"
     link=$(readlinkf_readlink "$1") &&:; set -- "$@" "$link" "$?"
     link=$(readlinkf_posix "$1")    &&:; set -- "$@" "$link" "$?"
 
