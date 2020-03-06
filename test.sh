@@ -50,6 +50,7 @@ done | {
   ex=0
   while IFS= read -r pathname; do
     set -- "$pathname"
+    # shellcheck disable=SC2230
     link=$($(which readlink) -f "$1") &&:; set -- "$@" "$link" "$?"
     link=$(readlinkf_readlink "$1") &&:; set -- "$@" "$link" "$?"
     link=$(readlinkf_posix "$1") &&:; set -- "$@" "$link" "$?"
