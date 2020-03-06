@@ -27,6 +27,7 @@ I keep it short as possible not to lengthen your script.
 
 [![Build Status](https://travis-ci.org/ko1nksm/readlinkf.svg?branch=master)](https://travis-ci.org/ko1nksm/readlinkf)
 
+Tested with `ash` (busybox), `bash`, `dash`, `ksh`, `mksh`, `posh`, `yash`, `zsh` on Debian 10.
 The tests are compared with the result of `readlink -f` command.
 
 If you want to test yourself, use `test.sh` script. Docker is required.
@@ -40,6 +41,70 @@ Note: The `readlink` built into busybox is not compatible with `readlink` of cor
 
 ```sh
 ./test.sh ash Dockerfile.alpine 3.11 # will fails
+```
+
+## Supplementary information
+
+### `cd` command compatibility
+
+| [exit status] | ash | bash | bosh | dash | ksh | mksh | posh | yash | zsh |
+| ------------- | --- | ---- | ---- | ---- | --- | ---- | ---- | ---- | --- |
+| `cd  ""`      | 0   | 0    | 1    | 0    | 1   | 0    | 0    | 0    | 0   |
+| `cd -P ""`    | 0   | 1    | 1    | 0    | 1   | 1    | 1    | 1    | 0   |
+| `cd -L ""`    | 0   | 0    | 1    | 0    | 1   | 0    | 0    | 0    | 0   |
+
+### `readlink` command compatibility
+
+coreutils
+
+```sh
+$ cd /tmp
+$ ln -s no-such-a-file symlink
+
+$ readlink symlink
+no-such-a-file # exit status: 0
+
+$ readlink -f symlink
+/tmp/no-such-a-file # exit status: 0
+
+$ cd /
+$ readlink -f /tmp/symlink
+/tmp/no-such-a-file # exit status: 0
+```
+
+busybox 1.31.1
+
+```sh
+$ cd /tmp
+$ ln -s no-such-a-file symlink
+
+# OK
+$ readlink symlink
+no-such-a-file # exit status: 0
+
+# BAD
+$ readlink -f symlink
+<none> # exit status: 1
+
+# BAD
+$ cd /
+$ readlink -f /tmp/symlink
+/tmp/symlink # exit status: 0
+```
+
+macOS
+
+```sh
+$ cd /tmp
+$ ln -s no-such-a-file symlink
+
+# OK
+$ readlink symlink
+no-such-a-file # exit status: 0
+
+# -f not implemented
+$ readlink -f symlink
+readlink: illegal option -- f # exit status: 1
 ```
 
 ## License
