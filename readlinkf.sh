@@ -19,3 +19,7 @@ readlinkf_posix() {
     l=$(ls -dl "$p" 2>"$3") && p=${l#*" $p -> "} || return 1
   done; return 1 # maximum recursive loop exceeded
 }
+
+# The format of "ls -dl" of symlink is defined below
+# https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html#tag_20_73_10
+# "%s -> %s", <pathname of link>, <contents of link>
