@@ -19,6 +19,8 @@ Using `ls` and `cd`, not using `readlink`. (POSIX compliant)
 
 ## Test
 
+[![Build Status](https://travis-ci.org/ko1nksm/readlinkf.svg?branch=master)](https://travis-ci.org/ko1nksm/readlinkf)
+
 The tests are compared with the result of `readlink -f` command.
 
 If you want to test yourself, use `test.sh` script. Docker is required.
