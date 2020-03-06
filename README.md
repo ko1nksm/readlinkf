@@ -14,10 +14,14 @@ Using `readlink` without `-f` option.
 
 Using `ls` and `cd`, not using `readlink`. (POSIX compliant)
 
-## readlinkf_readlink vs readlinkf_posix
+### readlinkf_readlink vs readlinkf_posix
 
-- `readlinkf_readlink`: Faster (about 1.5x - 2.0x).
+- `readlinkf_readlink`: Probably fast (about 1.5x - 2.0x).
 - `readlinkf_posix`: More portability.
+
+### About coding style
+
+I keep it short as possible not to lengthen your script.
 
 ## Test
 
