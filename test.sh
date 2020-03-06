@@ -1,76 +1,62 @@
 #!/bin/sh
 
 set -eu
+cd "$(dirname "$0")"
+
+. ./helper.sh
+. ./readlinkf.sh
 
 if [ ! -e /.dockerenv ]; then
-  if ! docker --version >&2; then
-    echo "[ERROR] You need docker to run" >&2
-    exit 1
-  fi
-
-  docker build -t readlinkf ./ >&2
-  docker run --rm readlinkf "./${0##*/}"
+  docker --version >&2 || abort "[ERROR] You need docker to run"
+  set -- "${1:-sh}" "${2:-Dockerfile}"
+  docker run --rm "$(docker build -q . -f "$2")" "$1" "./${0##*/}"
   exit
 fi
 
-. ./readlinkf.sh
+echo "================ Create files, directories and symlinks ================"
+make_file "/BASE/FILE"
+make_dir  "/BASE/DIR"
+make_link "/BASE/LINK -> FILE"
+make_link "/BASE/LINK2 -> DIR"
+make_file "/BASE/LINK2/FILE"
+make_link "/BASE/PARENT -> ../"
+make_link "/BASE/PARENT2 -> ../BASE"
+make_link "/BASE1 -> /BASE"
+make_link "/BASE/DIR/LINK1 -> ../FILE"
+make_link "/BASE/DIR/LINK2 -> ./LINK1"
+make_link "/BASE/DIR/LINK3 -> ../../LINK4"
+make_link "/LINK4 -> TMP/DIR/FILE"
+make_link "/LOOP1 -> ./LOOP2"
+make_link "/LOOP2 -> ./LOOP1"
+make_link "/MISSING -> ./NO_FILE"
+make_link "/ROOT -> /"
+make_file "/INCLUDE SPACE/FILE NAME"
+make_link "/INCLUDE SPACE/DIR NAME/SYMBOLIC LINK -> ../FILE NAME"
 
-dir() { mkdir -p "$1"; }
-file() { dir "$(dirname "$1")"; touch "$1"; }
-link() { dir "$(dirname "$1")"; ln -s "$2" "$1"; }
+echo "================================= Tree ================================="
+run tree -N --noreport -I "[a-z]*" /
 
-file /BASE/FILE
-dir  /BASE/DIR
-link /BASE/LINK         FILE
-link /BASE/LINK2        DIR
-file /BASE/LINK2/FILE
-link /BASE/PARENT       ../
-link /BASE/PARENT2      ../BASE
-link /BASE1             /BASE
-link /BASE/DIR/LINK1   ../FILE
-link /BASE/DIR/LINK2   ./LINK1
-link /BASE/DIR/LINK3   ../../LINK4
-link /LINK4             TMP/DIR/FILE
-link /LOOP1             ./LOOP2
-link /LOOP2             ./LOOP1
-link /MISSING           ./NO_FILE
-link /ROOT              /
-file "/INCLUDE SPACE/FILE NAME"
-link "/INCLUDE SPACE/DIR NAME/SYMBOLIC LINK"   "../FILE NAME"
+echo "================================= Tests ================================"
+{
+  find / -path "/[A-Z]*"
+  echo "/BASE/LINK2/FILE"
+} | sort | while IFS= read -r pathname; do
+  echo "$pathname"
+  echo "$pathname/"
+done | {
+  ex=0
+  while IFS= read -r pathname; do
+    set -- "$pathname"
+    link=$(readlink -f "$1")        &&:; set -- "$@" "$link" "$?"
+    link=$(readlinkf_readlink "$1") &&:; set -- "$@" "$link" "$?"
+    link=$(readlinkf_posix "$1")    &&:; set -- "$@" "$link" "$?"
 
-cat <<HERE
-# readlinkf
-
-  1. readlink (without -f option) implementation
-  2. POSIX compliant implementation
-
-HERE
-
-echo "## test"
-echo "\`\`\`"
-tree -N --noreport -I "[a-z]*" /
-echo "\`\`\`"
-echo
-echo "----------------------------------------------------------------------"
-echo
-echo "\`\`\`"
-check() {
-  readlink=$(readlink -f "$1") &&:
-  readlinkf=$(readlinkf "$1") &&:
-  readlinkf_posix=$(readlinkf_posix "$1") &&:
-
-  if [ "$readlink" = "$readlinkf" ] && [ "$readlink" = "$readlinkf_posix" ]; then
-    printf '[ok]  %s -> %s\n' "$1" "$readlink"
-  else
-    printf '[bad] %s -> %s : %s : %s\n' "$1" "$readlink" "$readlinkf" "$readlinkf_posix"
-  fi
+    if [ "$2($3)" = "$4($5)" ] && [ "$2($3)" = "$6($7)" ]; then
+      printf "\033[32m[pass]\033[m %s -> %s (exit status: %d)\n" "$1" "$2" "$3"
+    else
+      printf '\033[31m[fail]\033[m %s -> %s (%d) : %s (%d) : %s (%d)\n' "$@"
+      ex=1
+    fi
+  done
+  exit $ex
 }
-
-find / -path "/[A-Z]*" | sort | while IFS= read -r path; do
-  check "$path"
-  check "$path/"
-done
-
-check "/BASE/LINK2/FILE"
-check "/BASE/LINK2/FILE/"
-echo "\`\`\`"
