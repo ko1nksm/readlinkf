@@ -32,7 +32,7 @@ Because create a symbolic link safely on the root directory.
 ./test.sh [SHELL (default:sh)] [Dockerfile] [DOCKER-TAG (default: latest)]
 ```
 
-Note: busybox (alpine) `readlink` is not compatibile with coreutils `readlink`.
+Note: The `readlink` built into busybox is not compatible with `readlink` of coreutils.
 
 ```sh
 ./test.sh ash Dockerfile.alpine 3.11 # will fails
