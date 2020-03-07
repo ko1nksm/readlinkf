@@ -1,0 +1,4 @@
+ARG TAG=2018-10-30
+FROM shellspec/schilytools:$TAG
+RUN apt-get update && apt-get install -y tree
+COPY ./ /
