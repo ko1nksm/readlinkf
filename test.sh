@@ -48,8 +48,8 @@ echo "--------------------------------- Tree ---------------------------------"
 run tree -C -N --noreport -I "*[a-z]*" /
 
 echo "--------------------------------- Tests --------------------------------"
-TEST_COUNT=$((24 * 2 * 3)) # expected test count
-# TEST_COUNT=$((1 * 3))
+TEST_COUNT=$((25 * 2 * 4)) # expected test count
+# TEST_COUNT=$((1 * 4))
 
 pathes() {
   # echo "/RLF-BASE/FILE"
@@ -58,6 +58,7 @@ pathes() {
     find /RLF-*
     echo "/RLF-BASE/LINK2/FILE"
     echo ""
+    echo "."
     echo "../"
   } | sort | while IFS= read -r pathname; do
     echo "$pathname"
@@ -79,6 +80,10 @@ tests() {
     cd /usr/bin # relative path from other directory
     count=$((count+1))
     compare_with_readlink "../..$pathname" || ex=1
+
+    cd /RLF-BASE1 # on the symlink directory
+    count=$((count+1))
+    compare_with_readlink "${pathname#/}" || ex=1
   done
   [ "$ex" -ne 0 ] && fail 'some of the above path checks failed'
   if [ "$count" -ne "$TEST_COUNT" ]; then
@@ -105,7 +110,6 @@ compare_with_readlink() {
 
 pathes | tests &&:
 ex=$?
-
 
 echo "-------------------------------- Cleanup -------------------------------"
 run rm -rf "/RLF-BASE"
