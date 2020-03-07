@@ -2,8 +2,7 @@
 
 # readlink without -f option
 readlinkf_readlink() {
-  [ "${1:-}" ] && cd -P . || return 1
-  i=0; p=$1; [ -L "${p%/}" ] && [ ! -e "${p%/}" ] && p=${p%/}
+  [ "${1:-}" ] && cd -P . || return 1; i=0 p=${1%/}; [ -e "$p" ] && p=$1
   while [ $i -lt 10 ] && i=$((i+1)); do set -- "${p%/*}" "${p##*/}" /dev/null
     [ "$p" = "$1" ] || { cd -P "${1%/}/" 2>"$3" || return 1; p=$2; }
     [ ! -L "$p" ] && p=${PWD%/}${p:+/}$p && printf '%s\n' "${p:-/}" && return 0
@@ -13,8 +12,7 @@ readlinkf_readlink() {
 
 # POSIX compliant
 readlinkf_posix() {
-  [ "${1:-}" ] && cd -P . || return 1
-  i=0; p=$1; [ -L "${p%/}" ] && [ ! -e "${p%/}" ] && p=${p%/};
+  [ "${1:-}" ] && cd -P . || return 1; i=0 p=${1%/}; [ -e "$p" ] && p=$1
   while [ $i -lt 10 ] && i=$((i+1)); do set -- "${p%/*}" "${p##*/}" /dev/null
     [ "$p" = "$1" ] || { cd -P "${1%/}/" 2>"$3" || return 1; p=$2; }
     [ ! -L "$p" ] && p=${PWD%/}${p:+/}$p && printf '%s\n' "${p:-/}" && return 0
