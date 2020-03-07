@@ -48,7 +48,7 @@ echo "--------------------------------- Tree ---------------------------------"
 run tree -C -N --noreport -I "*[a-z]*" /
 
 echo "--------------------------------- Tests --------------------------------"
-TEST_COUNT=$((25 * 2 * 4)) # expected test count
+TEST_COUNT=$((27 * 2 * 4)) # expected test count
 # TEST_COUNT=$((1 * 4))
 
 pathes() {
@@ -57,9 +57,11 @@ pathes() {
   {
     find /RLF-*
     echo "/RLF-BASE/LINK2/FILE"
+    echo "/RLF-BASE/DIR/../FILE"
     echo ""
     echo "."
     echo "../"
+    echo "./RLF-NONE/../"
   } | sort | while IFS= read -r pathname; do
     echo "$pathname"
     echo "$pathname/"
