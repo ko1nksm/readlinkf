@@ -21,9 +21,9 @@ Using `ls` and `cd`, not using `readlink`. (POSIX compliant)
 
 ## Test
 
-[![Build Status](https://travis-ci.org/ko1nksm/readlinkf.svg?branch=master)](https://travis-ci.org/ko1nksm/readlinkf)
+[![Test Results](https://img.shields.io/travis/ko1nksm/readlinkf/master.svg?label=Test%20results&style=for-the-badge)](https://travis-ci.org/ko1nksm/readlinkf.svg?branch=master)
 
-Tested with `ash` (busybox), `bash`, `dash`, `ksh`, `mksh`, `posh`, `yash`, `zsh` on Debian 10.
+Tested with `ash` (busybox), `bosh`, `bash`, `dash`, `ksh`, `mksh`, `posh`, `yash`, `zsh` on Debian.
 The tests are compared with the result of `readlink -f` command.
 
 If you want to test yourself, use `test.sh` script.

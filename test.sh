@@ -7,14 +7,14 @@ cd "$(dirname "$0")"
 
 if [ "$(id -u)" -eq 0 ] && [ ! -e /.dockerenv ]; then
   if [ ! "${ALLOW_CREATION_TO_THE_ROOT_DIRECTORY:-}" ]; then
-    abort "[ERROR] Set ALLOW_CREATION_TO_THE_ROOT_DIRECTORY environment variable"
+    abort "Set ALLOW_CREATION_TO_THE_ROOT_DIRECTORY environment variable"
   fi
 else
   if [ ! -e /.dockerenv ]; then
-    docker --version >&2 || abort "[ERROR] You need docker to run"
+    docker --version >&2 || abort "You need docker to run"
     set -- "${1:-sh}" "${2:-Dockerfile}" "${3:-latest}"
-    set -- "$(docker build --build-arg "TAG=$3" -q . -f "$2")" "$1" "./${0##*/}"
-    run docker run --rm -t "$@"
+    cid=$(docker build --build-arg "TAG=$3" -q . -f "$2")
+    run docker run --rm -t "$cid" "$1" "./${0##*/}"
     exit
   fi
 fi
@@ -48,11 +48,12 @@ echo "--------------------------------- Tree ---------------------------------"
 run tree -C -N --noreport -I "*[a-z]*" /
 
 echo "--------------------------------- Tests --------------------------------"
-TEST_COUNT=$((44 * 3))
+TEST_COUNT=$((44 * 3)) # expected test count
 # TEST_COUNT=$((1 * 3))
 
 pathes() {
-  # echo "/RLF-BASE/FILE"; return # if you want to run only one path.
+  # echo "/RLF-BASE/FILE"
+  # return # if you want to run only specified path
   {
     find /RLF-*
     echo "/RLF-BASE/LINK2/FILE"
@@ -63,25 +64,22 @@ pathes() {
 }
 
 tests() {
-  ex=0 count=0
+  ex=0 count=0 cwd=$PWD
   while IFS= read -r pathname; do
-    set -- "$pathname"
-    cwd=$PWD
-
-    # absolute path
-    count=$((count+1)) && compare_with_readlink "$pathname" || ex=1
+    cd "$cwd" # absolute path
+    count=$((count+1))
+    compare_with_readlink "$pathname" || ex=1
 
     cd / # relative path from current directory
-    count=$((count+1)) && compare_with_readlink "${pathname#/}" || ex=1
+    count=$((count+1))
+    compare_with_readlink "${pathname#/}" || ex=1
 
     cd /usr/bin # relative path from other directory
-    count=$((count+1)) && compare_with_readlink "../..$pathname" || ex=1
-
-    cd "$cwd"
+    count=$((count+1))
+    compare_with_readlink "../..$pathname" || ex=1
   done
   if [ "$count" -ne "$TEST_COUNT" ]; then
-    set -- "$TEST_COUNT" "$count"
-    printf '\033[31m[fail]\033[m test count: expected %d, but ran %d\n' "$@"
+    fail 'test count: expected %d, but ran %d' "$TEST_COUNT" "$count"
     ex=1
   fi
   return "$ex"
@@ -94,9 +92,10 @@ compare_with_readlink() {
   link=$(readlinkf_posix "$1") &&:; set -- "$@" "$link" "$?"
 
   if [ "$2($3)" = "$4($5)" ] && [ "$2($3)" = "$6($7)" ]; then
-    printf "\033[32m[pass]\033[m %s -> %s (exit status: %d)\n" "$1" "$2" "$3"
+    pass "%s -> %s (exit status: %d)" "$1" "$2" "$3"
+    return 0
   else
-    printf '\033[31m[fail]\033[m %s -> %s (%d) : %s (%d) : %s (%d)\n' "$@"
+    fail "%s -> %s (%d) : %s (%d) : %s (%d)" "$@"
     return 1
   fi
 }

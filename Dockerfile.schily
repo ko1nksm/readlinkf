@@ -1,4 +1,4 @@
-ARG TAG=2018-10-30
+ARG TAG=latest
 FROM shellspec/schilytools:$TAG
 RUN apt-get update && apt-get install -y tree
 WORKDIR /root

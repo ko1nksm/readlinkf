@@ -1,5 +1,5 @@
 ARG TAG=latest
 FROM alpine:$TAG
-RUN apk add --no-cache tree busybox
+RUN apk add --no-cache tree busybox loksh
 WORKDIR /root
 COPY ./ ./

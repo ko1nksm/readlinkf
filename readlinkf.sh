@@ -28,7 +28,7 @@ case ${0##*/} in (readlinkf_readlink | readlinkf_posix)
   set -eu
 
   if [ $# -eq 0 ]; then
-    echo "readlink: missing operand"
+    echo "readlink: missing operand" >&2
     exit 1
   fi
 

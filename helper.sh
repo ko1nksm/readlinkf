@@ -1,12 +1,26 @@
 # shellcheck shell=sh
 
 abort() {
-  echo "$@" >&2
+  printf '\033[31m[ERROR]\033[m %s\n' "$*"
   exit 1
 }
 
+fail() {
+  msg=$1
+  shift
+  # shellcheck disable=SC2059
+  printf "\033[31m[fail]\033[m $msg\n" "$@"
+}
+
+pass() {
+  msg=$1
+  shift
+  # shellcheck disable=SC2059
+  printf "\033[32m[pass]\033[m $msg\n" "$@"
+}
+
 run() {
-  echo "\$" "$@"
+  echo '$' "$@"
   "$@"
 }
 
