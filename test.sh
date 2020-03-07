@@ -37,18 +37,20 @@ make_file "/INCLUDE SPACE/FILE NAME"
 make_link "/INCLUDE SPACE/DIR NAME/SYMBOLIC LINK -> ../FILE NAME"
 
 echo "--------------------------------- Tree ---------------------------------"
-run tree -N --noreport -I "[a-z]*" /
+run tree -N --noreport -I "[a-z]*|Makefile" /
 
 echo "--------------------------------- Tests --------------------------------"
+TEST_COUNT=44
 {
-  find / -path "/[A-Z]*"
+  find / -path "/[A-Z]*" | grep -v Makefile
   echo "/BASE/LINK2/FILE"
 } | sort | while IFS= read -r pathname; do
   echo "$pathname"
   echo "$pathname/"
 done | {
-  ex=0
+  ex=0 count=0
   while IFS= read -r pathname; do
+    count=$((count+1))
     set -- "$pathname"
     # shellcheck disable=SC2230
     link=$($(which readlink) -f "$1") &&:; set -- "$@" "$link" "$?"
@@ -62,5 +64,10 @@ done | {
       ex=1
     fi
   done
+  if [ "$count" -ne "$TEST_COUNT" ]; then
+    set -- "$TEST_COUNT" "$count"
+    printf '\033[31m[fail]\033[m test count: expected %d, but ran %d\n' "$@"
+    ex=1
+  fi
   exit $ex
 }
