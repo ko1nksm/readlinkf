@@ -4,7 +4,6 @@ set -eu
 cd "$(dirname "$0")"
 
 . ./helper.sh
-. ./readlinkf.sh
 
 if [ "$(id -u)" -eq 0 ] && [ ! -e /.dockerenv ]; then
   if [ ! "${ALLOW_CREATION_TO_THE_ROOT_DIRECTORY:-}" ]; then
@@ -14,11 +13,13 @@ else
   if [ ! -e /.dockerenv ]; then
     docker --version >&2 || abort "[ERROR] You need docker to run"
     set -- "${1:-sh}" "${2:-Dockerfile}" "${3:-latest}"
-    docker run --rm -t "$(docker build --build-arg "TAG=$3" -q . -f "$2")" "$1" "./${0##*/}"
+    set -- "$(docker build --build-arg "TAG=$3" -q . -f "$2")" "$1" "./${0##*/}"
+    run docker run --rm -t "$@"
     exit
   fi
 fi
 
+. ./readlinkf.sh
 
 echo "============================ /etc/os-release ==========================="
 [ -f /etc/os-release ] && cat /etc/os-release
