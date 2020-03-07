@@ -6,11 +6,17 @@ cd "$(dirname "$0")"
 . ./helper.sh
 . ./readlinkf.sh
 
-if [ ! -e /.dockerenv ]; then
-  docker --version >&2 || abort "[ERROR] You need docker to run"
-  set -- "${1:-sh}" "${2:-Dockerfile}" "${3:-latest}"
-  docker run --rm "$(docker build --build-arg "TAG=$3" -q . -f "$2")" "$1" "./${0##*/}"
-  exit
+if [ "$(id -u)" -eq 0 ] && [ ! -e /.dockerenv ]; then
+  if [ ! "${ALLOW_CREATION_TO_THE_ROOT_DIRECTORY:-}" ]; then
+    abort "[ERROR] Set ALLOW_CREATION_TO_THE_ROOT_DIRECTORY environment variable"
+  fi
+else
+  if [ ! -e /.dockerenv ]; then
+    docker --version >&2 || abort "[ERROR] You need docker to run"
+    set -- "${1:-sh}" "${2:-Dockerfile}" "${3:-latest}"
+    docker run --rm "$(docker build --build-arg "TAG=$3" -q . -f "$2")" "$1" "./${0##*/}"
+    exit
+  fi
 fi
 
 echo "============================ /etc/os-release ==========================="
@@ -42,7 +48,7 @@ run tree -N --noreport -I "*[a-z]*" /
 echo "--------------------------------- Tests --------------------------------"
 TEST_COUNT=44
 {
-  find / -path "/RLF-*"
+  find /RLF-*
   echo "/RLF-BASE/LINK2/FILE"
 } | sort | while IFS= read -r pathname; do
   echo "$pathname"

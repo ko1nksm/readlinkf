@@ -11,7 +11,7 @@ run() {
 }
 
 make_dir() {
-  run mkdir "$1"
+  run mkdir -p "$1"
 }
 
 make_file() {
@@ -22,5 +22,5 @@ make_file() {
 make_link() {
   from=${1#*" -> "} to=${1%" -> "*}
   mkdir -p "$(dirname "$to")"
-  run ln -s "$from" "$to"
+  run ln -snf "$from" "$to"
 }
