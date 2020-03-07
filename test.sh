@@ -100,10 +100,10 @@ compare_with_readlink() {
   link=$(readlinkf_posix "$1") &&:; set -- "$@" "$link" "$?"
 
   if [ "$2($3)" = "$4($5)" ] && [ "$2($3)" = "$6($7)" ]; then
-    pass "%s -> %s (exit status: %d)" "$1" "$2" "$3"
+    pass "%s -> %s (exit status: %d) [cd %s]" "$1" "$2" "$3" "$PWD"
     return 0
   else
-    fail "%s -> %s (%d) : %s (%d) : %s (%d)" "$@"
+    fail "%s -> %s (%d) : %s (%d) : %s (%d) [cd %s]" "$@" "$PWD"
     return 1
   fi
 }
