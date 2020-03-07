@@ -26,6 +26,7 @@ readlinkf_posix() {
 # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html#tag_20_73_10
 # "%s -> %s", <pathname of link>, <contents of link>
 
+# Run as a command is an example.
 case ${0##*/} in (readlinkf_readlink | readlinkf_posix)
   set -eu
 
@@ -34,7 +35,9 @@ case ${0##*/} in (readlinkf_readlink | readlinkf_posix)
     exit 1
   fi
 
+  ex=0
   for i; do
-    "${0##*/}" "$i"
+    ("${0##*/}" "$i") || ex=1
   done
+  exit "$ex"
 esac
