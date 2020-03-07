@@ -19,6 +19,19 @@ Using `ls` and `cd`, not using `readlink`. (POSIX compliant)
 - `readlinkf_readlink`: Probably fast (about 1.5x - 2.0x).
 - `readlinkf_posix`: More portability.
 
+### NOTE
+
+Those functions use the variables `p`, `i`,  `l` (`readlinkf_posix` only) and change the current directory and the variables `$PWD` and `$OLDPWD`.
+
+```sh
+# Be careful. The variables and the current directory will be changed.
+readlinkf_posix "$path"
+
+# This is no worry about. It uses subshell.
+# Therefore, the variables and the current directory will be restored.
+link=$(readlinkf_posix "$path")
+```
+
 ## Test
 
 [![Test Results](https://img.shields.io/travis/ko1nksm/readlinkf/master.svg?label=Test%20results&style=for-the-badge)](https://travis-ci.org/ko1nksm/readlinkf)
@@ -27,7 +40,7 @@ Tested with `ash` (busybox), `bosh`, `bash`, `dash`, `ksh`, `mksh`, `posh`, `yas
 The tests are compared with the result of `readlink -f` command.
 
 If you want to test yourself, use `test.sh` script.
-Root privilege is required for edge case test about the root directory.
+Root privilege is required for edge case test around the root directory.
 Therefore using Docker by default for safely create files on the root directory.
 
 ```sh
