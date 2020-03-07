@@ -48,7 +48,7 @@ echo "--------------------------------- Tree ---------------------------------"
 run tree -C -N --noreport -I "*[a-z]*" /
 
 echo "--------------------------------- Tests --------------------------------"
-TEST_COUNT=$((44 * 3)) # expected test count
+TEST_COUNT=$((24 * 2 * 3)) # expected test count
 # TEST_COUNT=$((1 * 3))
 
 pathes() {
@@ -57,6 +57,8 @@ pathes() {
   {
     find /RLF-*
     echo "/RLF-BASE/LINK2/FILE"
+    echo ""
+    echo "../"
   } | sort | while IFS= read -r pathname; do
     echo "$pathname"
     echo "$pathname/"
@@ -78,6 +80,7 @@ tests() {
     count=$((count+1))
     compare_with_readlink "../..$pathname" || ex=1
   done
+  [ "$ex" -ne 0 ] && fail 'some of the above path checks failed'
   if [ "$count" -ne "$TEST_COUNT" ]; then
     fail 'test count: expected %d, but ran %d' "$TEST_COUNT" "$count"
     ex=1
@@ -102,6 +105,7 @@ compare_with_readlink() {
 
 pathes | tests &&:
 ex=$?
+
 
 echo "-------------------------------- Cleanup -------------------------------"
 run rm -rf "/RLF-BASE"
