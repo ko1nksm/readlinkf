@@ -1,4 +1,4 @@
-# shellcheck shell=sh
+#!/bin/sh
 
 # readlink without -f option
 readlinkf_readlink() {
@@ -25,3 +25,16 @@ readlinkf_posix() {
 # The format of "ls -dl" of symlink is defined below
 # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html#tag_20_73_10
 # "%s -> %s", <pathname of link>, <contents of link>
+
+case ${0##*/} in (readlinkf_readlink | readlinkf_posix)
+  set -eu
+
+  if [ $# -eq 0 ]; then
+    echo "readlink: missing operand"
+    exit 1
+  fi
+
+  for i; do
+    "${0##*/}" "$i"
+  done
+esac
