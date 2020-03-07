@@ -4,7 +4,7 @@ Portable `readlink -f` implementation.
 
 ## readlinkf
 
-Source code: [readlinkf.sh](readlinkf.sh)
+Source code: [readlinkf.sh](readlinkf.sh) (I keep it short as possible not to lengthen your script)
 
 ### 1. readlinkf_readlink
 
@@ -19,10 +19,6 @@ Using `ls` and `cd`, not using `readlink`. (POSIX compliant)
 - `readlinkf_readlink`: Probably fast (about 1.5x - 2.0x).
 - `readlinkf_posix`: More portability.
 
-### About coding style
-
-I keep it short as possible not to lengthen your script.
-
 ## Test
 
 [![Build Status](https://travis-ci.org/ko1nksm/readlinkf.svg?branch=master)](https://travis-ci.org/ko1nksm/readlinkf)
@@ -30,8 +26,9 @@ I keep it short as possible not to lengthen your script.
 Tested with `ash` (busybox), `bash`, `dash`, `ksh`, `mksh`, `posh`, `yash`, `zsh` on Debian 10.
 The tests are compared with the result of `readlink -f` command.
 
-If you want to test yourself, use `test.sh` script. Docker is required.
-Because create a symbolic link safely on the root directory.
+If you want to test yourself, use `test.sh` script.
+Root privilege is required for edge case test about the root directory.
+Therefore using Docker by default for safely create files on the root directory.
 
 ```sh
 ./test.sh [SHELL (default:sh)] [Dockerfile] [DOCKER-TAG (default: latest)]
@@ -41,6 +38,13 @@ Note: The `readlink` built into busybox is not compatible with `readlink` of cor
 
 ```sh
 ./test.sh ash Dockerfile.alpine 3.11 # will fails
+```
+
+If you want to test without Docker, set `ALLOW_CREATION_TO_THE_ROOT_DIRECTORY`
+environment variable. Check `test.sh` script for what it do before running it.
+
+```sh
+sudo ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh
 ```
 
 ## Supplementary information
