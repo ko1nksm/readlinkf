@@ -46,7 +46,21 @@ echo "--------------------------------- Tree ---------------------------------"
 run tree -N --noreport -I "*[a-z]*" /
 
 echo "--------------------------------- Tests --------------------------------"
-TEST_COUNT=44
+TEST_COUNT=$((44 * 3))
+compare() {
+  # shellcheck disable=SC2230
+  link=$($(which readlink) -f "$1") &&:; set -- "$@" "$link" "$?"
+  link=$(readlinkf_readlink "$1") &&:; set -- "$@" "$link" "$?"
+  link=$(readlinkf_posix "$1") &&:; set -- "$@" "$link" "$?"
+
+  if [ "$2($3)" = "$4($5)" ] && [ "$2($3)" = "$6($7)" ]; then
+    printf "\033[32m[pass]\033[m %s -> %s (exit status: %d)\n" "$1" "$2" "$3"
+  else
+    printf '\033[31m[fail]\033[m %s -> %s (%d) : %s (%d) : %s (%d)\n' "$@"
+    return 1
+  fi
+}
+
 {
   find /RLF-*
   echo "/RLF-BASE/LINK2/FILE"
@@ -56,19 +70,19 @@ TEST_COUNT=44
 done | {
   ex=0 count=0
   while IFS= read -r pathname; do
-    count=$((count+1))
     set -- "$pathname"
-    # shellcheck disable=SC2230
-    link=$($(which readlink) -f "$1") &&:; set -- "$@" "$link" "$?"
-    link=$(readlinkf_readlink "$1") &&:; set -- "$@" "$link" "$?"
-    link=$(readlinkf_posix "$1") &&:; set -- "$@" "$link" "$?"
+    cwd=$PWD
 
-    if [ "$2($3)" = "$4($5)" ] && [ "$2($3)" = "$6($7)" ]; then
-      printf "\033[32m[pass]\033[m %s -> %s (exit status: %d)\n" "$1" "$2" "$3"
-    else
-      printf '\033[31m[fail]\033[m %s -> %s (%d) : %s (%d) : %s (%d)\n' "$@"
-      ex=1
-    fi
+    # absolute path
+    count=$((count+1)) && compare "$pathname" || ex=1
+
+    cd / # relative path from current directory
+    count=$((count+1)) && compare "${pathname#/}" || ex=1
+
+    cd /usr/bin # relative path from other directory
+    count=$((count+1)) && compare "../..$pathname" || ex=1
+
+    cd "$cwd"
   done
   if [ "$count" -ne "$TEST_COUNT" ]; then
     set -- "$TEST_COUNT" "$count"
