@@ -69,5 +69,17 @@ done | {
     printf '\033[31m[fail]\033[m test count: expected %d, but ran %d\n' "$@"
     ex=1
   fi
+
+  echo "-------------------------------- Cleanup -------------------------------"
+  run rm -rf "/RLF-BASE"
+  run rm -rf "/RLF-BASE1"
+  run rm -rf "/RLF-LINK4"
+  run rm -rf "/RLF-LOOP1"
+  run rm -rf "/RLF-LOOP2"
+  run rm -rf "/RLF-MISSING"
+  run rm -rf "/RLF-ROOT"
+  run rm -rf "/RLF-SPACE INCLUDED"
+  run tree -N --noreport -I "*[a-z]*" /
+
   exit $ex
 }
