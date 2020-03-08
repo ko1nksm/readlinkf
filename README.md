@@ -21,14 +21,13 @@ Using `ls` and `cd`, not using `readlink`. (POSIX compliant)
 
 ### NOTE
 
-Those functions use the variables `p`, `i`,  `l` (`readlinkf_posix` only) and change the current directory and the variables `$PWD` and `$OLDPWD`.
+Those functions use the variable `p` and change the variable `$OLDPWD`.
 
 ```sh
-# Be careful. The variables and the current directory will be changed.
+# Be careful. The variables will be changed.
 readlinkf_posix "$path"
 
-# This is no worry about. It uses subshell.
-# Therefore, the variables and the current directory will be restored.
+# It uses subshell. Therefore, the variables will be restored.
 link=$(readlinkf_posix "$path")
 ```
 
