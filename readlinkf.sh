@@ -2,30 +2,35 @@
 
 # Explanation
 #
-# set 10 ... :            10 is maximum recursive count
-# exit loop with $1 = 0:  Too many levels of symbolic links
-# exit loop with $1 = -1: No such file or directory
+# set -- 10 ...           Maximum recursive loop count
+# Exit loop with $1 = 0:  Too many levels of symbolic links
+# Positional parameters:
+#   $1: Loop count
+#   $2: Old $PWD
+#   $3: Old $OLDPWD
+#   $4: Work variable
+#   $5: Resolved path
 
 # readlink without -f option
 readlinkf_readlink() {
-  [ "${1:-}" ] || return 1; p=$1; until [ "${p%/}" = "$p" ]; do p=${p%/}; done
-  [ -e "$p" ] && p=$1; [ -d "$1" ] && p=$p/; set 10 "$PWD"; cd -P . || return 1
-  while [ "$1" -gt 0 ]; do set -- $(($1-1)) "$2" "${p%/*}" "${p##*/}"
-    [ "$p" = "$3" ] || { cd -P "$3/" || { set -- -1 "$2"; break; }; p=$4; }
-    [ ! -L "$p" ] && p=${PWD%/}${p:+/}$p && printf '%s\n' "${p:-/}" && break
-    p=$(readlink "$p") || set -- -1 "$2" "$3"
-  done 2>/dev/null; cd -L "$2" && [ "$1" -gt 0 ]
+  [ ${1:+x} ] || return 1; p=$1; until [ "${p%/}" = "$p" ]; do p=${p%/}; done
+  [ -e "$p" ] && p=$1; [ -d "$1" ] && p=$p/; set -- 10 "$PWD" "${OLDPWD:-}"
+  cd -P . && while [ "$1" -gt 0 ]; do set -- $(($1 - 1)) "$2" "$3" "${p%/*}"
+    [ "$p" != "$4" ] && { cd -P "${4:-/}" || break; p=${p##*/}; }
+    [ ! -L "$p" ] && p=${PWD%/}${p:+/}$p && set -- "$@" "${p:-/}" && break
+    p=$(readlink "$p") || break
+  done 2>/dev/null; cd -L "$2" && OLDPWD=$3 && [ ${5+x} ] && printf '%s\n' "$5"
 }
 
 # POSIX compliant
 readlinkf_posix() {
-  [ "${1:-}" ] || return 1; p=$1; until [ "${p%/}" = "$p" ]; do p=${p%/}; done
-  [ -e "$p" ] && p=$1; [ -d "$1" ] && p=$p/; set 10 "$PWD"; cd -P . || return 1
-  while [ "$1" -gt 0 ]; do set -- $(($1-1)) "$2" "${p%/*}" "${p##*/}"
-    [ "$p" = "$3" ] || { cd -P "$3/" || { set -- -1 "$2"; break; }; p=$4; }
-    [ ! -L "$p" ] && p=${PWD%/}${p:+/}$p && printf '%s\n' "${p:-/}" && break
-    set -- "$@" "$p"; p=$(ls -dl "$p") || set -- -1 "$2"; p=${p#*" $5 -> "}
-  done 2>/dev/null; cd -L "$2" && [ "$1" -gt 0 ]
+  [ ${1:+x} ] || return 1; p=$1; until [ "${p%/}" = "$p" ]; do p=${p%/}; done
+  [ -e "$p" ] && p=$1; [ -d "$1" ] && p=$p/; set -- 10 "$PWD" "${OLDPWD:-}"
+  cd -P . && while [ "$1" -gt 0 ]; do set -- $(($1 - 1)) "$2" "$3" "${p%/*}"
+    [ "$p" != "$4" ] && { cd -P "${4:-/}" || break; p=${p##*/}; }
+    [ ! -L "$p" ] && p=${PWD%/}${p:+/}$p && set -- "$@" "${p:-/}" && break
+    set -- "$1" "$2" "$3" "$p"; p=$(ls -dl "$p") || break; p=${p#*" $4 -> "}
+  done 2>/dev/null; cd -L "$2" && OLDPWD=$3 && [ ${5+x} ] && printf '%s\n' "$5"
 }
 
 # The format of "ls -dl" of symlink is defined below

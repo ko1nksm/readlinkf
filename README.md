@@ -23,14 +23,20 @@ Using `ls` and `cd`, not using `readlink`. (POSIX compliant)
 
 #### Variables
 
-Those functions use the variable `p` and change the variable `$OLDPWD`.
+Those functions use the variable `p` internally.
 
 ```sh
-# Be careful. The variables will be changed.
+# Be careful. The variable `p` will be changed.
+# The current directory, $PWD and $OLDPWD are preserved
+# (unless change to the current directory fails during process).
+p=foo
 readlinkf_posix "$path"
+echo "$p" # => not foo
 
 # It uses subshell. Therefore, the variables will be restored.
+p=foo
 link=$(readlinkf_posix "$path")
+echo "$p" # => foo
 ```
 
 #### CDPATH
