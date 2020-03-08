@@ -50,7 +50,7 @@ Therefore using Docker by default for safely create files on the root directory.
 Note: The `readlink` built into busybox is not compatible with `readlink` of coreutils.
 
 ```sh
-./test.sh ash Dockerfile.alpine 3.11 # will fails
+./test.sh ash dockerfiles/alpine 3.11 # will fails
 ```
 
 If you want to test without Docker, set `ALLOW_CREATION_TO_THE_ROOT_DIRECTORY`

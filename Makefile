@@ -4,7 +4,7 @@ test:
 	./test.sh sh
 	./test.sh ash
 	./test.sh bash
-	./test.sh bosh Dockerfile.schily
+	./test.sh bosh dockerfiles/schily
 	./test.sh ksh
 	./test.sh mksh
 	./test.sh posh

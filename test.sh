@@ -12,7 +12,7 @@ if [ "$(id -u)" -eq 0 ] && [ ! -e /.dockerenv ]; then
 else
   if [ ! -e /.dockerenv ]; then
     docker --version >&2 || abort "You need docker to run"
-    set -- "${1:-sh}" "${2:-Dockerfile}" "${3:-latest}"
+    set -- "${1:-sh}" "${2:-dockerfiles/debian}" "${3:-latest}"
     cid=$(docker build --build-arg "TAG=$3" -q . -f "$2")
     run docker run --rm -t "$cid" "$1" "./${0##*/}"
     exit
