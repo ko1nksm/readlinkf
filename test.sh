@@ -21,8 +21,9 @@ fi
 
 . ./readlinkf.sh
 
-echo "============================ /etc/os-release ==========================="
+echo "============================== Information ============================="
 [ -f /etc/os-release ] && cat /etc/os-release
+[ -f /etc/debian_version ] && cat /etc/debian_version
 
 echo "---------------- Create files, directories and symlinks ----------------"
 make_file "/RLF-BASE/FILE"
@@ -55,6 +56,7 @@ pathes() {
   # echo "/RLF-BASE/FILE"
   # return # if you want to run only specified path
   {
+    set +u
     find /RLF-*
     echo "/RLF-BASE/LINK2/FILE"
     echo "/RLF-BASE/DIR/../FILE"
