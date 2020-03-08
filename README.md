@@ -21,6 +21,8 @@ Using `ls` and `cd`, not using `readlink`. (POSIX compliant)
 
 ### NOTE
 
+#### Variables
+
 Those functions use the variable `p` and change the variable `$OLDPWD`.
 
 ```sh
@@ -30,6 +32,11 @@ readlinkf_posix "$path"
 # It uses subshell. Therefore, the variables will be restored.
 link=$(readlinkf_posix "$path")
 ```
+
+#### CDPATH
+
+Those functions use `cd` command. Therefore it affected by `CDPATH`.
+`CDPATH` must be empty for it to work properly.
 
 ## Test
 
