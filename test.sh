@@ -12,12 +12,14 @@ if [ "$(id -u)" -eq 0 ] && [ ! -e /.dockerenv ]; then
 else
   if [ ! -e /.dockerenv ]; then
     run docker --version >&2 || abort "You need docker to run"
-    set -- "${1:-sh}" "${2:-dockerfiles/debian}" "${3:-latest}"
+    shell=${1:-sh} dockerfile=${2:-dockerfiles/debian} tag=${3:-}
+    set -- -f "$dockerfile"
+    [ ${tag:+x} ] && set -- "$@" --build-arg "TAG=$tag"
     iidfile=$(mktemp)
-    run docker build --iidfile "$iidfile" --build-arg "TAG=$3" . -f "$2"
+    run docker build --iidfile "$iidfile" "$@" .
     iid=$(cat "$iidfile")
     rm "$iidfile"
-    run docker run --rm -t "$iid" "$1" "./${0##*/}"
+    run docker run --rm -t "$iid" "$shell" "./${0##*/}"
     exit
   fi
 fi
@@ -27,6 +29,7 @@ fi
 echo "============================== Information ============================="
 [ -f /etc/os-release ] && run cat /etc/os-release
 [ -f /etc/debian_version ] && run cat /etc/debian_version
+sleep 3
 
 echo "---------------- Create files, directories and symlinks ----------------"
 make_file "/RLF-BASE/FILE"

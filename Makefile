@@ -1,15 +1,23 @@
+TAG ?= latest
+DOCKERFILE := dockerfiles/debian
+
 all: test check
 
 test:
-	./test.sh sh
-	./test.sh ash
-	./test.sh bash
+	./test.sh sh $(DOCKERFILE) $(TAG)
+	./test.sh ash $(DOCKERFILE) $(TAG)
+	./test.sh bash $(DOCKERFILE) $(TAG)
+	./test.sh ksh $(DOCKERFILE) $(TAG)
+	./test.sh mksh $(DOCKERFILE) $(TAG)
+	./test.sh posh $(DOCKERFILE) $(TAG)
+	./test.sh yash $(DOCKERFILE) $(TAG)
+	./test.sh zsh $(DOCKERFILE) $(TAG)
+
+bosh:
 	./test.sh bosh dockerfiles/schily
-	./test.sh ksh
-	./test.sh mksh
-	./test.sh posh
-	./test.sh yash
-	./test.sh zsh
+
+pbosh:
+	./test.sh pbosh dockerfiles/schily
 
 check:
 	shellcheck *.sh

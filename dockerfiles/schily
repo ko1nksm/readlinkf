@@ -1,5 +1,21 @@
-ARG TAG=latest
-FROM shellspec/schilytools:$TAG
-RUN apt-get update && apt-get install -y tree
+FROM buildpack-deps:buster as builder
+# I do not support before this version because I think it is not mature enough
+ARG TAG=2018-10-30
+ENV DEBIAN_FRONTEND=noninteractive DEBCONF_NOWARNINGS=yes
+RUN apt-get update && apt-get -y install e2fslibs-dev
+RUN echo "==== TAG: $TAG ===="
+RUN VERSION=schily-$TAG \
+ && URL=https://sourceforge.net/projects/schilytools/files/$VERSION.tar.bz2/download \
+ && wget -nv -O- --trust-server-names "$URL" | tar xfj - \
+ && cd $VERSION \
+ && if [ $TAG = 2019-09-22 ]; then \
+      mv bsh/dotfiles.bsh.tar.bz2 bsh/dotfiles.tar.bz2; \
+      mv ved/dotfiles.ved.tar.bz2 ved/dotfiles.tar.bz2; \
+    fi \
+ && make install
+
+FROM debian:buster-slim
+RUN apt-get update && apt-get -y install tree
+COPY --from=builder /opt/schily/bin/* /usr/local/bin/
 WORKDIR /root
 COPY ./ ./
