@@ -21,28 +21,27 @@ Using `ls` and `cd`, not using `readlink`. (POSIX compliant)
 
 ### NOTE
 
-#### Variables
+Those functions get the current directory from the `PWD` variable instead of the real current directory.
+Usually both are same unless assigning to `PWD` variable intentionally.
+After calling the function, The current directory is restored to the value of `PWD` before the call.
 
-Those functions use the variable `p` internally.
+The function uses `cd` command, however it not affected by `CDPATH`.
+
+The function uses the variable `p` internally. Therefore, it will be changed after the call.
+Other variables (including `PWD`, `OLDPWD` and `CDPATH`) not change.
+(Unless change to the original directory fails).
 
 ```sh
-# Be careful. The variable `p` will be changed.
-# The current directory, $PWD and $OLDPWD are preserved
-# (unless change to the current directory fails during process).
+# The variable `p` will be changed.
 p=foo
 readlinkf_posix "$path"
 echo "$p" # => not foo
 
-# It uses subshell. Therefore, the variables will be restored.
+# It uses subshell. Therefore, the variable `p` not change.
 p=foo
 link=$(readlinkf_posix "$path")
 echo "$p" # => foo
 ```
-
-#### CDPATH
-
-Those functions use `cd` command. Therefore it affected by `CDPATH`.
-`CDPATH` must be empty for it to work properly.
 
 ## Test
 
