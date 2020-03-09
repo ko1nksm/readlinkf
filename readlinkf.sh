@@ -15,7 +15,7 @@
 # readlink without -f option
 readlinkf_readlink() {
   [ ${1:+x} ] || return 1; p=$1; until [ "${p%/}" = "$p" ]; do p=${p%/}; done
-  [ -e "$p" ] && p=$1; [ -d "$1" ] && p=$p/; set 10 "$PWD" "${OLDPWD:-}";
+  [ -e "$p" ] && p=$1; [ -d "$1" ] && p=$p/; set 10 "$PWD" "${OLDPWD:-}"
   CDPATH="" cd -P "$2" && while [ "$1" -gt 0 ]; do set "$1" "$2" "$3" "${p%/*}"
     [ "$p" = "$4" ] || { CDPATH="" cd -P "${4:-/}" || break; p=${p##*/}; }
     [ ! -L "$p" ] && p=${PWD%/}${p:+/}$p && set "$@" "${p:-/}" && break
