@@ -28,7 +28,7 @@ After calling the function, The current directory is restored to the value of `P
 The function uses `cd` command, however it not affected by `CDPATH`.
 
 The function uses the variable `p` internally. Therefore, it will be changed after the call.
-Other variables (including `PWD`, `OLDPWD` and `CDPATH`) not change.
+Other variables including `PWD`, `OLDPWD` and `CDPATH` not change
 (Unless change to the original directory fails).
 
 ```sh
