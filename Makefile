@@ -20,4 +20,4 @@ pbosh:
 	./test.sh pbosh dockerfiles/schily
 
 check:
-	shellcheck *.sh
+	shellcheck helper.sh readlinkf.sh test.sh

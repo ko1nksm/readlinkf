@@ -4,32 +4,31 @@ Portable `readlink -f` implementation.
 
 ## readlinkf
 
-Source code: [readlinkf.sh](readlinkf.sh) (I keep it short as possible not to lengthen your script)
+Source code: [readlinkf.sh](readlinkf.sh)
+(I keep it short as possible not to lengthen your script)
 
 ### 1. readlinkf_readlink
 
-Using `readlink` without `-f` option.
+Using `pwd`, `cd` and `readlink` without `-f` option.
 
 ### 2. readlinkf_posix
 
-Using `ls` and `cd`, not using `readlink`. (POSIX compliant)
+Using `pwd`, `cd` and `ls -dl`. (POSIX compliant)
 
 ### readlinkf_readlink vs readlinkf_posix
 
 - `readlinkf_readlink`: Probably fast (about 1.5x - 2.0x).
-- `readlinkf_posix`: More portability.
+- `readlinkf_posix`: POSIX compliant and more portability.
 
 ### NOTE
 
-Those functions get the current directory from the `PWD` variable instead of the real current directory.
-Usually both are same unless assigning to `PWD` variable intentionally.
-After calling the function, The current directory is restored to the value of `PWD` before the call.
+The function uses `cd` command internally, however it not affected by `CDPATH`.
 
-The function uses `cd` command, however it not affected by `CDPATH`.
+The function uses variable `p` internally.
+Therefore, it will be changed after the call unless using subshell.
 
-The function uses the variable `p` internally. Therefore, it will be changed after the call.
-Other variables including `PWD`, `OLDPWD` and `CDPATH` not change
-(Unless change to the original directory fails).
+Current directory and other variables `PWD`, `OLDPWD` and `CDPATH` not change
+(unless change to the original directory fails).
 
 ```sh
 # The variable `p` will be changed.
@@ -48,7 +47,7 @@ echo "$p" # => foo
 [![Test Results](https://img.shields.io/travis/ko1nksm/readlinkf/master.svg?label=Test%20results&style=for-the-badge)](https://travis-ci.org/ko1nksm/readlinkf)
 
 Tested with `ash` (busybox), `bosh`, `bash`, `dash`, `ksh`, `mksh`, `posh`, `yash`, `zsh` on Debian.
-The tests are compared with the result of `readlink -f` command.
+The tests are compared with the result of GNU `readlink -f` command.
 
 If you want to test yourself, use `test.sh` script.
 Root privilege is required for edge case test around the root directory.
@@ -58,7 +57,7 @@ Therefore using Docker by default for safely create files on the root directory.
 ./test.sh [SHELL (default:sh)] [Dockerfile] [DOCKER-TAG (default: latest)]
 ```
 
-Note: The `readlink` built into busybox is not compatible with `readlink` of coreutils.
+Note: The `readlink` built into busybox is not compatible with `readlink` of GNU coreutils.
 
 ```sh
 ./test.sh ash dockerfiles/alpine 3.11 # will fails
@@ -83,7 +82,7 @@ sudo ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh
 
 ### `readlink` command compatibility
 
-coreutils
+GNU coreutils
 
 ```sh
 $ cd /tmp
