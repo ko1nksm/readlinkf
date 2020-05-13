@@ -134,6 +134,10 @@ $ readlink -f symlink
 readlink: illegal option -- f # exit status: 1
 ```
 
+## Changelog
+
+- 2020-05-13 Release v1.0.0
+
 ## License
 
 Creative Commons Zero v1.0 Universal.
