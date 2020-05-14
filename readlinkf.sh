@@ -33,10 +33,10 @@ readlinkf_readlink() {
 }
 
 readlinkf_readlink_() {
-  [ ${1:+x} ] || return 1; p=$1; until [ _"${p%/}" = _"$p" ]; do p=${p%/}; done
+  [ ${1:+x} ] || return 1; p=$1; until [ "${p%/}" = "$p" ]; do p=${p%/}; done
   [ -e "$p" ] && p=$1; [ -d "$1" ] && p=$p/; set 10
-  CDPATH="" cd -P "$PWD" && while [ "$1" -gt 0 ]; do set "$1" "${p%/*}"
-    [ _"$p" = _"$2" ] || { CDPATH="" cd -P "${2:-/}" || break; p=${p##*/}; }
+  cd -P "$PWD" && while [ "$1" -gt 0 ]; do set "$1" "${p%/*}"
+    [ "$p" = "$2" ] || { CDPATH="" cd -P "${2:-/}" || break; p=${p##*/}; }
     [ ! -L "$p" ] && p=${PWD%/}${p:+/}$p && set "$@" "${p:-/}" && break
     set $(($1-1)); p=$(readlink "$p") || break
   done 2>/dev/null; [ ${3+x} ] && printf '%s\n' "$3"
@@ -48,10 +48,10 @@ readlinkf_posix() {
 }
 
 readlinkf_posix_() {
-  [ ${1:+x} ] || return 1; p=$1; until [ _"${p%/}" = _"$p" ]; do p=${p%/}; done
+  [ ${1:+x} ] || return 1; p=$1; until [ "${p%/}" = "$p" ]; do p=${p%/}; done
   [ -e "$p" ] && p=$1; [ -d "$1" ] && p=$p/; set 10
-  CDPATH="" cd -P "$PWD" && while [ "$1" -gt 0 ]; do set "$1" "${p%/*}"
-    [ _"$p" = _"$2" ] || { CDPATH="" cd -P "${2:-/}" || break; p=${p##*/}; }
+  cd -P "$PWD" && while [ "$1" -gt 0 ]; do set "$1" "${p%/*}"
+    [ "$p" = "$2" ] || { CDPATH="" cd -P "${2:-/}" || break; p=${p##*/}; }
     [ ! -L "$p" ] && p=${PWD%/}${p:+/}$p && set "$@" "${p:-/}" && break
     set $(($1-1)) "$p"; p=$(ls -dl "$p") || break; p=${p#*" $2 -> "}
   done 2>/dev/null; [ ${3+x} ] && printf '%s\n' "$3"
