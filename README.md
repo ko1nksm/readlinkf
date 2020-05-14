@@ -1,48 +1,33 @@
-# Portable readlink -f
+# POSIX compliant readlink -f
 
-Portable `readlink -f` implementation.
+POSIX compliant `readlink -f` shell function implementation for POSIX shell.
 
 ## readlinkf
 
 Source code: [readlinkf.sh](readlinkf.sh)
-(I keep it short as possible not to lengthen your script)
 
-### 1. readlinkf_readlink
+Note: These functions have no side effects after calling.
+Does not change the current directory and any variables.
 
-Using `pwd`, `cd` and `readlink` without `-f` option.
+Maximum depth of symbolic links is 10.
+Please modify the source code if you want to change.
 
-### 2. readlinkf_posix
+### 1. readlinkf_posix
 
-Using `pwd`, `cd` and `ls -dl`. (POSIX compliant)
+*Usage:* `readlinkf_posix <varname> <path>`
 
-### readlinkf_readlink vs readlinkf_posix
+This function using `cd -P` and `ls -dl`.
 
-- `readlinkf_readlink`: Probably fast (about 1.5x - 2.0x).
-- `readlinkf_posix`: POSIX compliant and more portability.
+### 2. readlinkf_readlink
 
-### NOTE
+*Usage:* `readlinkf_readlink <varname> <path>`
 
-The function uses `cd` command internally, however it not affected by `CDPATH`.
+This function using `cd -P` and `readlink` (without `-f`).
 
-The function uses variable `p` internally.
-Therefore, it will be changed after the call unless using subshell.
+Note: Probably fast than `readlinkf_posix`, but `readlink` is not POSIX compliant.
+It may not be installed in some environments.
 
-Current directory and other variables `PWD`, `OLDPWD` and `CDPATH` not change
-(unless change to the original directory fails).
-
-```sh
-# The variable `p` will be changed.
-p=foo
-readlinkf_posix "$path"
-echo "$p" # => not foo
-
-# It uses subshell. Therefore, the variable `p` not change.
-p=foo
-link=$(readlinkf_posix "$path")
-echo "$p" # => foo
-```
-
-## Test
+## About test
 
 [![Test Results](https://img.shields.io/travis/ko1nksm/readlinkf/master.svg?label=Test%20results&style=for-the-badge)](https://travis-ci.org/ko1nksm/readlinkf)
 
@@ -136,7 +121,8 @@ readlink: illegal option -- f # exit status: 1
 
 ## Changelog
 
-- 2020-05-13 Release v1.0.0
+- v1.0.0: 2020-05-13 Short code version
+- Unreleased: Friendly version
 
 ## License
 
