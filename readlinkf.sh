@@ -1,34 +1,8 @@
 #!/bin/sh
 # shellcheck disable=SC2004
 
-# Usage
-#   Arguments:
-#     $1: Symbolic link (or regular path)
-#
-#   Exit status:
-#     0: Path found
-#     1: Path not found
-#
-# Note
-#   `set 10 ...` is Maximum recursive loop count. When exit while loop
-#   with $1 = 0, It means "Too many levels of symbolic links".
-#
-# Meaning of positional parameters used internally
-#   $1: Remain loop count
-#   $2: Original $PWD
-#   $3: Original $OLDPWD
-#   $4: Work variable
-#   $5: Resolved path
-#
-# Included workarounds
-#   $(pwd): PWD is not initialized when script started on ksh.
-#   PWD=: I don't know why, Ksh on Ubuntu 12.04 won't work without this.
-#   First CDPATH assignment: Not working second CDPATH assignment on ksh.
-#   Use cd instead of cd -L: cd -L is not implemented on NetBSD sh.
-#   Underscore of [ _"$p" = _"$4" ]: Avoid "unknown operand" when $p is "!".
-#     e.g dash 0.5.3, busybox 1.22.0
-
-# readlink without -f option
+# readlink without -f option version
+# Usage: readlinkf_readlink <varname> <path>
 readlinkf_readlink() {
   if [ $# -gt 1 ]; then
     eval "$1=\$(readlinkf_readlink \"\$2\")"
@@ -62,7 +36,8 @@ readlinkf_readlink() {
   fi
 }
 
-# POSIX compliant
+# POSIX compliant version
+# Usage: readlinkf_readlink <varname> <path>
 readlinkf_posix() {
   if [ $# -gt 1 ]; then
     eval "$1=\$(readlinkf_posix \"\$2\")"
@@ -90,16 +65,14 @@ readlinkf_posix() {
         return 0
       fi
 
+      # See https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html
+      # "%s -> %s", <pathname of link>, <contents of link>
       link=$(ls -dl "$target" 2>/dev/null) || break
       target=${link#*" $target -> "}
     done
     return 1
   fi
 }
-
-# The format of "ls -dl" of symlink is defined below
-# https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html#tag_20_73_10
-# "%s -> %s", <pathname of link>, <contents of link>
 
 # Run as a command is an example.
 case ${0##*/} in (readlinkf_readlink | readlinkf_posix)
