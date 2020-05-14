@@ -1,5 +1,4 @@
 #!/bin/sh
-# shellcheck disable=SC2004
 
 # POSIX compliant version
 # Usage: readlinkf_readlink <varname> <path>
@@ -18,7 +17,7 @@ readlinkf_posix() {
     [ -d "${target:-/}" ] && target="$target/"
 
     cd -P "$PWD" 2>/dev/null || return 1
-    while [ "$loop" -gt 0 ] && loop=$(($loop - 1)); do
+    while [ "$loop" -gt 0 ] && loop=$((loop - 1)); do
       if [ ! "$target" = "${target%/*}" ]; then
         cd -P "${target%/*}/" 2>/dev/null || break
         target=${target##*/}
@@ -56,7 +55,7 @@ readlinkf_readlink() {
     [ -d "${target:-/}" ] && target="$target/"
 
     cd -P "$PWD" 2>/dev/null || return 1
-    while [ "$loop" -gt 0 ] && loop=$(($loop - 1)); do
+    while [ "$loop" -gt 0 ] && loop=$((loop - 1)); do
       if [ ! "$target" = "${target%/*}" ]; then
         cd -P "${target%/*}/" 2>/dev/null || break
         target=${target##*/}
