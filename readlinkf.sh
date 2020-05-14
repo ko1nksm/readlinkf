@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck disable=SC2004
 
 # Usage
 #   Arguments:
@@ -36,12 +37,12 @@ readlinkf_readlink_() {
   [ ${1:+x} ] || return 1
   p=$1 loop=10 CDPATH=""
 
-  while [ ! "${p%/}" = "$p" ]; do
-    p=${p%/}
-  done
-
-  [ -e "$p" ] && p=$1
-  [ -d "$1" ] && p=$p/
+  if [ ! -e "${p%/}" ]; then
+    while [ ! "${p%/}" = "$p" ]; do
+      p=${p%/}
+    done
+  fi
+  [ -d "${p:-/}" ] && p="$p/"
 
   cd -P "$PWD" 2>/dev/null || return 1
   while [ "$loop" -gt 0 ] && loop=$(($loop - 1)); do
@@ -70,12 +71,12 @@ readlinkf_posix_() {
   [ ${1:+x} ] || return 1
   p=$1 loop=10 CDPATH=""
 
-  while [ ! "${p%/}" = "$p" ]; do
-    p=${p%/}
-  done
-
-  [ -e "$p" ] && p=$1
-  [ -d "$1" ] && p=$p/
+  if [ ! -e "${p%/}" ]; then
+    while [ ! "${p%/}" = "$p" ]; do
+      p=${p%/}
+    done
+  fi
+  [ -d "${p:-/}" ] && p="$p/"
 
   cd -P "$PWD" 2>/dev/null || return 1
   while [ "$loop" -gt 0 ] && loop=$(($loop - 1)); do
