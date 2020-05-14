@@ -34,12 +34,12 @@ readlinkf_readlink() {
 
 readlinkf_readlink_() {
   [ ${1:+x} ] || return 1; p=$1; until [ _"${p%/}" = _"$p" ]; do p=${p%/}; done
-  [ -e "$p" ] && p=$1; [ -d "$1" ] && p=$p/; set 10 "$(pwd)" "${OLDPWD:-}"; PWD=
-  CDPATH="" cd -P "$2" && while [ "$1" -gt 0 ]; do set "$1" "$2" "$3" "${p%/*}"
-    [ _"$p" = _"$4" ] || { CDPATH="" cd -P "${4:-/}" || break; p=${p##*/}; }
+  [ -e "$p" ] && p=$1; [ -d "$1" ] && p=$p/; set 10
+  CDPATH="" cd -P "$PWD" && while [ "$1" -gt 0 ]; do set "$1" "${p%/*}"
+    [ _"$p" = _"$2" ] || { CDPATH="" cd -P "${2:-/}" || break; p=${p##*/}; }
     [ ! -L "$p" ] && p=${PWD%/}${p:+/}$p && set "$@" "${p:-/}" && break
-    set $(($1-1)) "$2" "$3"; p=$(readlink "$p") || break
-  done 2>/dev/null; cd "$2" && OLDPWD=$3 && [ ${5+x} ] && printf '%s\n' "$5"
+    set $(($1-1)); p=$(readlink "$p") || break
+  done 2>/dev/null; [ ${3+x} ] && printf '%s\n' "$3"
 }
 
 # POSIX compliant
@@ -49,12 +49,12 @@ readlinkf_posix() {
 
 readlinkf_posix_() {
   [ ${1:+x} ] || return 1; p=$1; until [ _"${p%/}" = _"$p" ]; do p=${p%/}; done
-  [ -e "$p" ] && p=$1; [ -d "$1" ] && p=$p/; set 10 "$(pwd)" "${OLDPWD:-}"; PWD=
-  CDPATH="" cd -P "$2" && while [ "$1" -gt 0 ]; do set "$1" "$2" "$3" "${p%/*}"
-    [ _"$p" = _"$4" ] || { CDPATH="" cd -P "${4:-/}" || break; p=${p##*/}; }
+  [ -e "$p" ] && p=$1; [ -d "$1" ] && p=$p/; set 10
+  CDPATH="" cd -P "$PWD" && while [ "$1" -gt 0 ]; do set "$1" "${p%/*}"
+    [ _"$p" = _"$2" ] || { CDPATH="" cd -P "${2:-/}" || break; p=${p##*/}; }
     [ ! -L "$p" ] && p=${PWD%/}${p:+/}$p && set "$@" "${p:-/}" && break
-    set $(($1-1)) "$2" "$3" "$p"; p=$(ls -dl "$p") || break; p=${p#*" $4 -> "}
-  done 2>/dev/null; cd "$2" && OLDPWD=$3 && [ ${5+x} ] && printf '%s\n' "$5"
+    set $(($1-1)) "$p"; p=$(ls -dl "$p") || break; p=${p#*" $2 -> "}
+  done 2>/dev/null; [ ${3+x} ] && printf '%s\n' "$3"
 }
 
 # The format of "ls -dl" of symlink is defined below
