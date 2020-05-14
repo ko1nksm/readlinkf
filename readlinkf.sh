@@ -34,7 +34,7 @@ readlinkf_readlink() {
 
 readlinkf_readlink_() {
   [ ${1:+x} ] || return 1
-  p=$1
+  p=$1 loop=10
 
   while [ ! "${p%/}" = "$p" ]; do
     p=${p%/}
@@ -42,10 +42,9 @@ readlinkf_readlink_() {
 
   [ -e "$p" ] && p=$1
   [ -d "$1" ] && p=$p/
-  loop=10
-  cd -P "$PWD" || return 1
 
-  while [ "$loop" -gt 0 ]; do
+  CDPATH="" cd -P "$PWD" || return 1
+  while [ "$loop" -gt 0 ] && loop=$(($loop - 1)); do
     set "${p%/*}"
 
     if [ ! "$p" = "$1" ]; then
@@ -54,17 +53,14 @@ readlinkf_readlink_() {
     fi
 
     if [ ! -L "$p" ]; then
-      p=${PWD%/}${p:+/}$p
-      set "$1" "${p:-/}"
-      break
+      p="${PWD%/}${p:+/}$p"
+      printf '%s\n' "${p:-/}"
+      return 0
     fi
 
-    loop=$((loop - 1))
     p=$(readlink "$p" 2>/dev/null) || break
   done
-
-  [ ${2+x} ] || return 1
-  printf '%s\n' "$2"
+  return 1
 }
 
 # POSIX compliant
@@ -74,7 +70,7 @@ readlinkf_posix() {
 
 readlinkf_posix_() {
   [ ${1:+x} ] || return 1
-  p=$1
+  p=$1 loop=10
 
   while [ ! "${p%/}" = "$p" ]; do
     p=${p%/}
@@ -82,10 +78,9 @@ readlinkf_posix_() {
 
   [ -e "$p" ] && p=$1
   [ -d "$1" ] && p=$p/
-  loop=10
-  cd -P "$PWD" || return 1
 
-  while [ "$loop" -gt 0 ]; do
+  CDPATH="" cd -P "$PWD" || return 1
+  while [ "$loop" -gt 0 ] && loop=$(($loop - 1)); do
     set "${p%/*}"
 
     if [ ! "$p" = "$1" ]; then
@@ -94,19 +89,15 @@ readlinkf_posix_() {
     fi
 
     if [ ! -L "$p" ]; then
-      p=${PWD%/}${p:+/}$p
-      set "$1" "${p:-/}"
-      break
+      p="${PWD%/}${p:+/}$p"
+      printf '%s\n' "${p:-/}"
+      return 0
     fi
 
-    loop=$((loop - 1))
-    t=$p
-    p=$(ls -dl "$p" 2>/dev/null) || break
-    p=${p#*" $t -> "}
+    link=$(ls -dl "$p" 2>/dev/null) || break
+    p=${link#*" $p -> "}
   done
-
-  [ ${2+x} ] || return 1
-  printf '%s\n' "$2"
+  return 1
 }
 
 # The format of "ls -dl" of symlink is defined below
