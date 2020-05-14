@@ -119,8 +119,8 @@ tests() {
 compare_with_readlink() {
   # shellcheck disable=SC2230
   link=$($(which readlink) -f "$1") &&:; set -- "$@" "$link" "$?"
-  link=$(readlinkf_readlink "$1") &&:; set -- "$@" "$link" "$?"
-  link=$(readlinkf_posix "$1") &&:; set -- "$@" "$link" "$?"
+  readlinkf_readlink link "$1" &&:; set -- "$@" "$link" "$?"
+  readlinkf_posix link "$1" &&:; set -- "$@" "$link" "$?"
 
   if [ "$2($3)" = "$4($5)" ] && [ "$2($3)" = "$6($7)" ]; then
     pass "%s -> %s (exit status: %d) [cd %s]" "$1" "$2" "$3" "$PWD"
@@ -149,12 +149,12 @@ variable_check() {
   fi
 }
 
-readlinkf_readlink /RLF-BASE/DIR/LINK3 >/dev/null
+readlinkf_readlink link /RLF-BASE/DIR/LINK3 >/dev/null
 variable_check 'readlinkf_readlink: PWD' [ "$PWD" = /tmp ]
 variable_check 'readlinkf_readlink: OLDPWD' [ "$OLDPWD" = /var ]
 variable_check 'readlinkf_readlink: CDPATH' [ "$CDPATH" = /usr ]
 
-readlinkf_posix /RLF-BASE/DIR/LINK3 >/dev/null
+readlinkf_posix link /RLF-BASE/DIR/LINK3 >/dev/null
 variable_check 'readlinkf_posix: PWD' [ "$PWD" = /tmp ]
 variable_check 'readlinkf_posix: OLDPWD' [ "$OLDPWD" = /var ]
 variable_check 'readlinkf_posix: CDPATH' [ "$CDPATH" = /usr ]

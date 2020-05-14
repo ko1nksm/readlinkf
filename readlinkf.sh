@@ -29,6 +29,10 @@
 
 # readlink without -f option
 readlinkf_readlink() {
+  eval "$1=\$(readlinkf_readlink_ \"\$2\")"
+}
+
+readlinkf_readlink_() {
   [ ${1:+x} ] || return 1; p=$1; until [ _"${p%/}" = _"$p" ]; do p=${p%/}; done
   [ -e "$p" ] && p=$1; [ -d "$1" ] && p=$p/; set 10 "$(pwd)" "${OLDPWD:-}"; PWD=
   CDPATH="" cd -P "$2" && while [ "$1" -gt 0 ]; do set "$1" "$2" "$3" "${p%/*}"
@@ -40,6 +44,10 @@ readlinkf_readlink() {
 
 # POSIX compliant
 readlinkf_posix() {
+  eval "$1=\$(readlinkf_posix_ \"\$2\")"
+}
+
+readlinkf_posix_() {
   [ ${1:+x} ] || return 1; p=$1; until [ _"${p%/}" = _"$p" ]; do p=${p%/}; done
   [ -e "$p" ] && p=$1; [ -d "$1" ] && p=$p/; set 10 "$(pwd)" "${OLDPWD:-}"; PWD=
   CDPATH="" cd -P "$2" && while [ "$1" -gt 0 ]; do set "$1" "$2" "$3" "${p%/*}"
