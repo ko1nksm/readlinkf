@@ -35,29 +35,29 @@ readlinkf_readlink() {
 
 readlinkf_readlink_() {
   [ ${1:+x} ] || return 1
-  p=$1 loop=10 CDPATH=""
+  target=$1 loop=10 CDPATH=""
 
-  if [ ! -e "${p%/}" ]; then
-    while [ ! "${p%/}" = "$p" ]; do
-      p=${p%/}
+  if [ ! -e "${target%/}" ]; then
+    while [ ! "${target%/}" = "$target" ]; do
+      target=${target%/}
     done
   fi
-  [ -d "${p:-/}" ] && p="$p/"
+  [ -d "${target:-/}" ] && target="$target/"
 
   cd -P "$PWD" 2>/dev/null || return 1
   while [ "$loop" -gt 0 ] && loop=$(($loop - 1)); do
-    if [ ! "$p" = "${p%/*}" ]; then
-      cd -P "${p%/*}/" 2>/dev/null || break
-      p=${p##*/}
+    if [ ! "$target" = "${target%/*}" ]; then
+      cd -P "${target%/*}/" 2>/dev/null || break
+      target=${target##*/}
     fi
 
-    if [ ! -L "$p" ]; then
-      p="${PWD%/}${p:+/}$p"
-      printf '%s\n' "${p:-/}"
+    if [ ! -L "$target" ]; then
+      target="${PWD%/}${target:+/}$target"
+      printf '%s\n' "${target:-/}"
       return 0
     fi
 
-    p=$(readlink "$p" 2>/dev/null) || break
+    target=$(readlink "$target" 2>/dev/null) || break
   done
   return 1
 }
@@ -69,30 +69,30 @@ readlinkf_posix() {
 
 readlinkf_posix_() {
   [ ${1:+x} ] || return 1
-  p=$1 loop=10 CDPATH=""
+  target=$1 loop=10 CDPATH=""
 
-  if [ ! -e "${p%/}" ]; then
-    while [ ! "${p%/}" = "$p" ]; do
-      p=${p%/}
+  if [ ! -e "${target%/}" ]; then
+    while [ ! "${target%/}" = "$target" ]; do
+      target=${target%/}
     done
   fi
-  [ -d "${p:-/}" ] && p="$p/"
+  [ -d "${target:-/}" ] && target="$target/"
 
   cd -P "$PWD" 2>/dev/null || return 1
   while [ "$loop" -gt 0 ] && loop=$(($loop - 1)); do
-    if [ ! "$p" = "${p%/*}" ]; then
-      cd -P "${p%/*}/" 2>/dev/null || break
-      p=${p##*/}
+    if [ ! "$target" = "${target%/*}" ]; then
+      cd -P "${target%/*}/" 2>/dev/null || break
+      target=${target##*/}
     fi
 
-    if [ ! -L "$p" ]; then
-      p="${PWD%/}${p:+/}$p"
-      printf '%s\n' "${p:-/}"
+    if [ ! -L "$target" ]; then
+      target="${PWD%/}${target:+/}$target"
+      printf '%s\n' "${target:-/}"
       return 0
     fi
 
-    link=$(ls -dl "$p" 2>/dev/null) || break
-    p=${link#*" $p -> "}
+    link=$(ls -dl "$target" 2>/dev/null) || break
+    target=${link#*" $target -> "}
   done
   return 1
 }
