@@ -34,7 +34,7 @@ readlinkf_readlink() {
 
 readlinkf_readlink_() {
   [ ${1:+x} ] || return 1
-  p=$1 loop=10
+  p=$1 loop=10 CDPATH=""
 
   while [ ! "${p%/}" = "$p" ]; do
     p=${p%/}
@@ -43,10 +43,10 @@ readlinkf_readlink_() {
   [ -e "$p" ] && p=$1
   [ -d "$1" ] && p=$p/
 
-  CDPATH="" cd -P "$PWD" || return 1
+  cd -P "$PWD" 2>/dev/null || return 1
   while [ "$loop" -gt 0 ] && loop=$(($loop - 1)); do
     if [ ! "$p" = "${p%/*}" ]; then
-      CDPATH="" cd -P "${p%/*}/" 2>/dev/null || break
+      cd -P "${p%/*}/" 2>/dev/null || break
       p=${p##*/}
     fi
 
@@ -68,7 +68,7 @@ readlinkf_posix() {
 
 readlinkf_posix_() {
   [ ${1:+x} ] || return 1
-  p=$1 loop=10
+  p=$1 loop=10 CDPATH=""
 
   while [ ! "${p%/}" = "$p" ]; do
     p=${p%/}
@@ -77,10 +77,10 @@ readlinkf_posix_() {
   [ -e "$p" ] && p=$1
   [ -d "$1" ] && p=$p/
 
-  CDPATH="" cd -P "$PWD" || return 1
+  cd -P "$PWD" 2>/dev/null || return 1
   while [ "$loop" -gt 0 ] && loop=$(($loop - 1)); do
     if [ ! "$p" = "${p%/*}" ]; then
-      CDPATH="" cd -P "${p%/*}/" 2>/dev/null || break
+      cd -P "${p%/*}/" 2>/dev/null || break
       p=${p##*/}
     fi
 
