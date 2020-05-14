@@ -45,10 +45,8 @@ readlinkf_readlink_() {
 
   CDPATH="" cd -P "$PWD" || return 1
   while [ "$loop" -gt 0 ] && loop=$(($loop - 1)); do
-    set "${p%/*}"
-
-    if [ ! "$p" = "$1" ]; then
-      CDPATH="" cd -P "${1:-/}" 2>/dev/null || break
+    if [ ! "$p" = "${p%/*}" ]; then
+      CDPATH="" cd -P "${p%/*}/" 2>/dev/null || break
       p=${p##*/}
     fi
 
@@ -81,10 +79,8 @@ readlinkf_posix_() {
 
   CDPATH="" cd -P "$PWD" || return 1
   while [ "$loop" -gt 0 ] && loop=$(($loop - 1)); do
-    set "${p%/*}"
-
-    if [ ! "$p" = "$1" ]; then
-      CDPATH="" cd -P "${1:-/}" 2>/dev/null || break
+    if [ ! "$p" = "${p%/*}" ]; then
+      CDPATH="" cd -P "${p%/*}/" 2>/dev/null || break
       p=${p##*/}
     fi
 
