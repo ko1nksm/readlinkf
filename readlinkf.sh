@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -eu
+
 # POSIX compliant version
 # Usage: readlinkf_readlink <varname> <path>
 readlinkf_posix() {
