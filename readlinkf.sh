@@ -11,11 +11,7 @@ readlinkf_posix() {
     [ ${1:+x} ] || return 1
     target=$1 loop=10 CDPATH=""
 
-    if [ ! -e "${target%/}" ]; then
-      while [ ! "${target%/}" = "$target" ]; do
-        target=${target%/}
-      done
-    fi
+    [ -e "${target%/}" ] || target=${target%"${target##*[!/]}"}
     [ -d "${target:-/}" ] && target="$target/"
 
     cd -P "$PWD" 2>/dev/null || return 1
@@ -49,11 +45,7 @@ readlinkf_readlink() {
     [ ${1:+x} ] || return 1
     target=$1 loop=10 CDPATH=""
 
-    if [ ! -e "${target%/}" ]; then
-      while [ ! "${target%/}" = "$target" ]; do
-        target=${target%/}
-      done
-    fi
+    [ -e "${target%/}" ] || target=${target%"${target##*[!/]}"}
     [ -d "${target:-/}" ] && target="$target/"
 
     cd -P "$PWD" 2>/dev/null || return 1
