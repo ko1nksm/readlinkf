@@ -27,8 +27,10 @@ readlinkf_posix() {
         return 0
       fi
 
-      # See https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html
-      # "%s -> %s", <pathname of link>, <contents of link>
+      # `ls -dl` format: "%s %u %s %s %u %s %s -> %s\n"
+      #   <file mode>, <number of links>, <owner name>, <group name>,
+      #   <size>, <date and time>, <pathname of link>, <contents of link>
+      # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html
       link=$(ls -dl "$target" 2>/dev/null) || break
       target=${link#*" $target -> "}
     done
