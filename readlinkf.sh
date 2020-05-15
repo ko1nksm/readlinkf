@@ -14,7 +14,7 @@ readlinkf_posix() {
     [ -e "${target%/}" ] || target=${target%"${target##*[!/]}"}
     [ -d "${target:-/}" ] && target="$target/"
 
-    cd -P "$PWD" 2>/dev/null || return 1
+    cd -P . 2>/dev/null || return 1
     while [ "$loop" -gt 0 ] && loop=$((loop - 1)); do
       if [ ! "$target" = "${target%/*}" ]; then
         cd -P "${target%/*}/" 2>/dev/null || break
@@ -48,7 +48,7 @@ readlinkf_readlink() {
     [ -e "${target%/}" ] || target=${target%"${target##*[!/]}"}
     [ -d "${target:-/}" ] && target="$target/"
 
-    cd -P "$PWD" 2>/dev/null || return 1
+    cd -P . 2>/dev/null || return 1
     while [ "$loop" -gt 0 ] && loop=$((loop - 1)); do
       if [ ! "$target" = "${target%/*}" ]; then
         cd -P "${target%/*}/" 2>/dev/null || break
