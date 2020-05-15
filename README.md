@@ -10,7 +10,7 @@ Note: These functions have no side effects after calling.
 Does not change the current directory and any variables.
 
 Maximum depth of symbolic links is 10.
-Please modify the source code if you want to change.
+If you want to change, modify `max_symlinks` variable in the function.
 
 ### 1. readlinkf_posix
 

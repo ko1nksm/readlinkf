@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -eu
-
 # POSIX compliant version
 # Usage: readlinkf_readlink <varname> <path>
 readlinkf_posix() {
@@ -9,13 +7,13 @@ readlinkf_posix() {
     eval "$1=\$(readlinkf_posix \"\$2\")"
   else
     [ ${1:+x} ] || return 1
-    target=$1 loop=10 CDPATH=""
+    target=$1 max_symlinks=10 CDPATH=''
 
-    [ -e "${target%/}" ] || target=${target%"${target##*[!/]}"}
+    [ -e "${target%/}" ] || target=${1%"${1##*[!/]}"} # trim trailing slashes
     [ -d "${target:-/}" ] && target="$target/"
 
     cd -P . 2>/dev/null || return 1
-    while [ "$loop" -gt 0 ] && loop=$((loop - 1)); do
+    while [ "$max_symlinks" -gt 0 ] && max_symlinks=$((max_symlinks - 1)); do
       if [ ! "$target" = "${target%/*}" ]; then
         cd -P "${target%/*}/" 2>/dev/null || break
         target=${target##*/}
@@ -27,7 +25,7 @@ readlinkf_posix() {
         return 0
       fi
 
-      # `ls -dl` format: "%s %u %s %s %u %s %s -> %s\n"
+      # `ls -dl` format: "%s %u %s %s %u %s %s -> %s\n",
       #   <file mode>, <number of links>, <owner name>, <group name>,
       #   <size>, <date and time>, <pathname of link>, <contents of link>
       # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html
@@ -45,13 +43,13 @@ readlinkf_readlink() {
     eval "$1=\$(readlinkf_readlink \"\$2\")"
   else
     [ ${1:+x} ] || return 1
-    target=$1 loop=10 CDPATH=""
+    target=$1 max_symlinks=10 CDPATH=''
 
-    [ -e "${target%/}" ] || target=${target%"${target##*[!/]}"}
+    [ -e "${target%/}" ] || target=${1%"${1##*[!/]}"} # trim trailing slashes
     [ -d "${target:-/}" ] && target="$target/"
 
     cd -P . 2>/dev/null || return 1
-    while [ "$loop" -gt 0 ] && loop=$((loop - 1)); do
+    while [ "$max_symlinks" -gt 0 ] && max_symlinks=$((max_symlinks - 1)); do
       if [ ! "$target" = "${target%/*}" ]; then
         cd -P "${target%/*}/" 2>/dev/null || break
         target=${target##*/}
@@ -78,9 +76,9 @@ case ${0##*/} in (readlinkf_posix | readlinkf_readlink)
     exit 1
   fi
 
-  ex=0
+  ex=0 cmd=${0##*/}
   for i; do
-    "${0##*/}" "$i" || ex=1
+    ("$cmd" "$i") || ex=1
   done
   exit "$ex"
 esac
