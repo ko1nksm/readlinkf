@@ -33,7 +33,12 @@ This implementation uses `cd -P` and `readlink` (without `-f`).
 Note: Probably fast than `readlinkf_posix`, but `readlink` is not POSIX compliant.
 It may not be installed in some environments.
 
-## About test
+## Limitation
+
+`readlinkf` cannot handle filenames that end with a newline.
+It is very rare case, therefore I chose performance and code simplicity.
+
+## About the test
 
 [![Test Results](https://img.shields.io/travis/ko1nksm/readlinkf/master.svg?label=Test%20results&style=for-the-badge)](https://travis-ci.org/ko1nksm/readlinkf)
 
