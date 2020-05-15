@@ -1,28 +1,34 @@
 # POSIX compliant readlink -f
 
-POSIX compliant `readlink -f` shell function implementation for POSIX shell.
+POSIX compliant `readlink -f` implementation for POSIX shell scripts.
+
+**Status: Refactoring towards v1.1.0 release**
+
+Short code version has been temporarily removed. See [v1.0.0](https://github.com/ko1nksm/readlinkf/releases/tag/v1.0.0) if you need it.
 
 ## readlinkf
 
 Source code: [readlinkf.sh](readlinkf.sh)
 
-Note: These functions have no side effects after calling.
-Does not change the current directory and any variables.
+### Usage
+
+  1. `varname=$(readlinkf_* "<path>")` (assign to variable)
+  2. `(readlinkf_* "<path>")` (output to stdout)
+  3. `readlinkf_* "<path>"` (output to stdout, not recommended)
+
+Note: Usage 1 and 2 use subshells and therefore have no side effects. It does
+not change the current directory and any variables. Usage 3 has side effects.
 
 Maximum depth of symbolic links is 10.
 If you want to change, modify `max_symlinks` variable in the function.
 
 ### 1. readlinkf_posix
 
-*Usage:* `readlinkf_posix <varname> <path>`
-
-This function using `cd -P` and `ls -dl`.
+This implementation uses `cd -P` and `ls -dl`.
 
 ### 2. readlinkf_readlink
 
-*Usage:* `readlinkf_readlink <varname> <path>`
-
-This function using `cd -P` and `readlink` (without `-f`).
+This implementation uses `cd -P` and `readlink` (without `-f`).
 
 Note: Probably fast than `readlinkf_posix`, but `readlink` is not POSIX compliant.
 It may not be installed in some environments.
