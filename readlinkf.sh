@@ -1,70 +1,60 @@
 #!/bin/sh
 
 # POSIX compliant version
-# Usage: readlinkf_readlink <varname> <path>
 readlinkf_posix() {
-  if [ $# -gt 1 ]; then
-    eval "$1=\$(readlinkf_posix \"\$2\")"
-  else
-    [ ${1:+x} ] || return 1
-    target=$1 max_symlinks=10 CDPATH=''
+  [ "${1:-}" ] || return 1
+  target=$1 max_symlinks=10 CDPATH=''
 
-    [ -e "${target%/}" ] || target=${1%"${1##*[!/]}"} # trim trailing slashes
-    [ -d "${target:-/}" ] && target="$target/"
+  [ -e "${target%/}" ] || target=${1%"${1##*[!/]}"} # trim trailing slashes
+  [ -d "${target:-/}" ] && target="$target/"
 
-    cd -P . 2>/dev/null || return 1
-    while [ "$max_symlinks" -gt 0 ] && max_symlinks=$((max_symlinks - 1)); do
-      if [ ! "$target" = "${target%/*}" ]; then
-        cd -P "${target%/*}/" 2>/dev/null || break
-        target=${target##*/}
-      fi
+  cd -P . 2>/dev/null || return 1
+  while [ "$max_symlinks" -gt 0 ] && max_symlinks=$((max_symlinks - 1)); do
+    if [ ! "$target" = "${target%/*}" ]; then
+      cd -P "${target%/*}/" 2>/dev/null || break
+      target=${target##*/}
+    fi
 
-      if [ ! -L "$target" ]; then
-        target="${PWD%/}${target:+/}$target"
-        printf '%s\n' "${target:-/}"
-        return 0
-      fi
+    if [ ! -L "$target" ]; then
+      target="${PWD%/}${target:+/}$target"
+      printf '%s\n' "${target:-/}"
+      return 0
+    fi
 
-      # `ls -dl` format: "%s %u %s %s %u %s %s -> %s\n",
-      #   <file mode>, <number of links>, <owner name>, <group name>,
-      #   <size>, <date and time>, <pathname of link>, <contents of link>
-      # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html
-      link=$(ls -dl "$target" 2>/dev/null) || break
-      target=${link#*" $target -> "}
-    done
-    return 1
-  fi
+    # `ls -dl` format: "%s %u %s %s %u %s %s -> %s\n",
+    #   <file mode>, <number of links>, <owner name>, <group name>,
+    #   <size>, <date and time>, <pathname of link>, <contents of link>
+    # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html
+    link=$(ls -dl "$target" 2>/dev/null) || break
+    target=${link#*" $target -> "}
+  done
+  return 1
 }
 
 # readlink version
-# Usage: readlinkf_readlink <varname> <path>
 readlinkf_readlink() {
-  if [ $# -gt 1 ]; then
-    eval "$1=\$(readlinkf_readlink \"\$2\")"
-  else
-    [ ${1:+x} ] || return 1
-    target=$1 max_symlinks=10 CDPATH=''
+  [ "${1:-}" ] || return 1
+  target=$1 max_symlinks=10 CDPATH=''
 
-    [ -e "${target%/}" ] || target=${1%"${1##*[!/]}"} # trim trailing slashes
-    [ -d "${target:-/}" ] && target="$target/"
+  [ -e "${target%/}" ] || target=${1%"${1##*[!/]}"} # trim trailing slashes
+  [ -d "${target:-/}" ] && target="$target/"
 
-    cd -P . 2>/dev/null || return 1
-    while [ "$max_symlinks" -gt 0 ] && max_symlinks=$((max_symlinks - 1)); do
-      if [ ! "$target" = "${target%/*}" ]; then
-        cd -P "${target%/*}/" 2>/dev/null || break
-        target=${target##*/}
-      fi
+  cd -P . 2>/dev/null || return 1
+  while [ "$max_symlinks" -gt 0 ] && max_symlinks=$((max_symlinks - 1)); do
+    if [ ! "$target" = "${target%/*}" ]; then
+      cd -P "${target%/*}/" 2>/dev/null || break
+      target=${target##*/}
+    fi
 
-      if [ ! -L "$target" ]; then
-        target="${PWD%/}${target:+/}$target"
-        printf '%s\n' "${target:-/}"
-        return 0
-      fi
+    if [ ! -L "$target" ]; then
+      target="${PWD%/}${target:+/}$target"
+      printf '%s\n' "${target:-/}"
+      return 0
+    fi
 
-      target=$(readlink "$target" 2>/dev/null) || break
-    done
-    return 1
-  fi
+    target=$(readlink "$target" 2>/dev/null) || break
+  done
+  return 1
 }
 
 # Run as a command is an example.
