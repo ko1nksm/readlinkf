@@ -16,8 +16,8 @@ test:
 bosh:
 	./test.sh bosh dockerfiles/schily
 
-pbosh:
-	./test.sh pbosh dockerfiles/schily
+#pbosh: OLDPWD is not supported?
+#	./test.sh pbosh dockerfiles/schily
 
 check:
 	shellcheck helper.sh readlinkf.sh test.sh

@@ -48,7 +48,8 @@ It is very rare case, therefore I chose performance and code simplicity.
 
 ## About the test
 
-[![Test Results](https://img.shields.io/travis/ko1nksm/readlinkf/master.svg?label=Test%20results&style=for-the-badge)](https://travis-ci.org/ko1nksm/readlinkf)
+[![Test Results](https://img.shields.io/cirrus/github/ko1nksm/readlinkf/master?label=Test%20results&style=for-the-badge)](https://cirrus-ci.com/github/ko1nksm/readlinkf/master)
+
 
 Tested with `ash` (busybox), `bosh`, `bash`, `dash`, `ksh`, `mksh`, `posh`, `yash`, `zsh` on Debian.
 The tests are compared with the result of GNU `readlink -f` command.

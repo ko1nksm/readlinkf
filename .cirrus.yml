@@ -1,0 +1,117 @@
+linux_task:
+  container:
+    image: debian
+  install_script:
+    - apt-get update
+    - apt-get install -y tree bash busybox dash ksh mksh posh yash zsh
+    - ln -s /bin/busybox /usr/local/bin/ash
+  env:
+    - ALLOW_CREATION_TO_THE_ROOT_DIRECTORY: 1
+  script:
+    - ./test.sh sh
+    - ./test.sh ash
+    - ./test.sh bash
+    - ./test.sh dash
+    - ./test.sh ksh
+    - ./test.sh lksh
+    - ./test.sh mksh
+    - ./test.sh posh
+    - ./test.sh yash
+    - ./test.sh zsh
+
+freebsd_task:
+  freebsd_instance:
+    image_family: freebsd-12-1
+  install_script:
+    - pkg install -y tree coreutils dash bash ksh93 mksh oksh yash zsh
+  env:
+    - ALLOW_CREATION_TO_THE_ROOT_DIRECTORY: 1
+  script:
+    - ./test.sh sh
+    - ./test.sh bash
+    - ./test.sh dash
+    - ./test.sh ksh
+    - ./test.sh mksh
+    - ./test.sh oksh
+    - ./test.sh yash
+    - ./test.sh zsh
+
+osx_task:
+  osx_instance:
+    image: catalina-base
+  install_script:
+    - brew install tree coreutils
+  script:
+    - mkdir -p ~/chroot/dev ~/chroot/usr
+    - sudo cp -a -X /bin /sbin ~/chroot/
+    - sudo cp -a -X /usr/bin /usr/lib /usr/local ~/chroot/usr/
+    - sudo cp -a -X ./ ~/chroot/root
+    - sudo chroot ~/chroot sh -c 'ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 /root/test.sh sh'
+    - sudo chroot ~/chroot sh -c 'ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 /root/test.sh bash'
+    - sudo chroot ~/chroot sh -c 'ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 /root/test.sh ksh'
+    - sudo chroot ~/chroot sh -c 'ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 /root/test.sh zsh'
+
+osxbrew_task:
+  osx_instance:
+    image: catalina-base
+  install_script:
+    - brew install tree coreutils dash bash ksh mksh yash zsh
+  script:
+    - mkdir -p ~/chroot/dev ~/chroot/usr
+    - sudo cp -a -X /bin /sbin ~/chroot/
+    - sudo cp -a -X /usr/bin /usr/lib /usr/local ~/chroot/usr/
+    - sudo cp -a -X ./ ~/chroot/root
+    - sudo chroot ~/chroot sh -c 'ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 /root/test.sh sh'
+    - sudo chroot ~/chroot sh -c 'ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 /root/test.sh bash'
+    - sudo chroot ~/chroot sh -c 'ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 /root/test.sh dash'
+    - sudo chroot ~/chroot sh -c 'ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 /root/test.sh ksh'
+    - sudo chroot ~/chroot sh -c 'ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 /root/test.sh mksh'
+    - sudo chroot ~/chroot sh -c 'ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 /root/test.sh yash'
+    - sudo chroot ~/chroot sh -c 'ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 /root/test.sh zsh'
+
+gitbash_task:
+  windows_container:
+    image: cirrusci/windowsservercore:2019
+    os_version: 2019
+  env:
+    - PATH: $ProgramFiles\Git\bin;$PATH
+    - MSYS: winsymlinks:lnk
+  script:
+    - sh -c "ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh sh"
+    - sh -c "ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh bash"
+    - sh -c "ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh dash"
+
+msys_task:
+  windows_container:
+    image: cirrusci/windowsservercore:2019
+    os_version: 2019
+  env:
+    - PATH: C:\tools\msys64\usr\bin;$PATH
+    - MSYS: winsymlinks:lnk
+  install_script:
+    - choco install -y msys2
+    - pacman -S --noconfirm tree dash bash mksh zsh
+  script:
+    - sh -c "ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh sh"
+    - sh -c "ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh dash"
+    - sh -c "ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh bash"
+    - sh -c "ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh mksh"
+    - sh -c "ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh zsh"
+
+cygwin_task:
+  windows_container:
+    image: cirrusci/windowsservercore:2019
+    os_version: 2019
+  env:
+    - PATH: C:\tools\cygwin\bin;$PATH
+    - CYGWIN: winsymlinks:lnk
+  install_script:
+    - choco install -y cygwin cyg-get
+    - cyg-get tree dash bash mksh posh zsh
+  script:
+    - sh -c "ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh sh"
+    - sh -c "ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh dash"
+    - sh -c "ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh bash"
+    - sh -c "ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh mksh"
+    - sh -c "ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh posh"
+    - sh -c "ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh zsh"

@@ -5,23 +5,20 @@ cd "$(dirname "$0")"
 
 . ./helper.sh
 
-if [ "$(id -u)" -eq 0 ] && [ ! -e /.dockerenv ]; then
-  if [ ! "${ALLOW_CREATION_TO_THE_ROOT_DIRECTORY:-}" ]; then
-    abort "Set ALLOW_CREATION_TO_THE_ROOT_DIRECTORY environment variable"
-  fi
+if [ -e /.dockerenv ] || [ "${ALLOW_CREATION_TO_THE_ROOT_DIRECTORY:-}" ]; then
+  : start testing
+elif run docker --version >&2; then
+  shell=${1:-sh} dockerfile=${2:-dockerfiles/debian} tag=${3:-}
+  set -- -f "$dockerfile"
+  [ ${tag:+x} ] && set -- "$@" --build-arg "TAG=$tag"
+  iidfile=$(mktemp)
+  run docker build --iidfile "$iidfile" "$@" .
+  iid=$(cat "$iidfile")
+  rm "$iidfile"
+  run docker run --rm -t "$iid" "$shell" "./${0##*/}"
+  exit
 else
-  if [ ! -e /.dockerenv ]; then
-    run docker --version >&2 || abort "You need docker to run"
-    shell=${1:-sh} dockerfile=${2:-dockerfiles/debian} tag=${3:-}
-    set -- -f "$dockerfile"
-    [ ${tag:+x} ] && set -- "$@" --build-arg "TAG=$tag"
-    iidfile=$(mktemp)
-    run docker build --iidfile "$iidfile" "$@" .
-    iid=$(cat "$iidfile")
-    rm "$iidfile"
-    run docker run --rm -t "$iid" "$shell" "./${0##*/}"
-    exit
-  fi
+  abort "You need docker or specify ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 to run"
 fi
 
 . ./readlinkf.sh
@@ -56,7 +53,7 @@ make_file "/RLF-SPACE INCLUDED/FILE NAME"
 make_link "/RLF-SPACE INCLUDED/DIR NAME/SYMBOLIC LINK -> ../FILE NAME"
 
 echo "--------------------------------- Tree ---------------------------------"
-run tree -C -N --noreport -I "*[a-z]*" /
+run tree -C -N --noreport -I "*[a-z]*" / ||:
 
 echo "--------------------------------- Tests --------------------------------"
 TEST_COUNT=$((29 * 2 * 4)) # expected test count
@@ -116,9 +113,17 @@ tests() {
   return "$ex"
 }
 
+readlink_native() {
+  if type greadlink >/dev/null 2>&1; then
+    $(which greadlink) "$@"
+  else
+    $(which readlink) "$@"
+  fi
+}
+
 compare_with_readlink() {
   # shellcheck disable=SC2230
-  link=$($(which readlink) -f "$1") &&:; set -- "$@" "$link" "$?"
+  link=$(readlink_native -f "$1") &&:; set -- "$@" "$link" "$?"
   link=$(readlinkf_posix "$1") &&:; set -- "$@" "$link" "$?"
   link=$(readlinkf_readlink "$1") &&:; set -- "$@" "$link" "$?"
 
@@ -136,8 +141,8 @@ ex=$?
 
 # Extra test
 pass_fail_number=$((TEST_COUNT + 2))
-cd /var
-cd /tmp
+cd /bin
+cd /dev
 CDPATH=/usr
 
 variable_check() {
@@ -150,13 +155,13 @@ variable_check() {
 }
 
 link=$(readlinkf_readlink /RLF-BASE/DIR/LINK3) >/dev/null
-variable_check 'readlinkf_readlink: PWD' [ "$PWD" = /tmp ]
-variable_check 'readlinkf_readlink: OLDPWD' [ "$OLDPWD" = /var ]
+variable_check 'readlinkf_readlink: PWD' [ "$PWD" = /dev ]
+variable_check 'readlinkf_readlink: OLDPWD' [ "$OLDPWD" = /bin ]
 variable_check 'readlinkf_readlink: CDPATH' [ "$CDPATH" = /usr ]
 
 link=$(readlinkf_posix /RLF-BASE/DIR/LINK3) >/dev/null
-variable_check 'readlinkf_posix: PWD' [ "$PWD" = /tmp ]
-variable_check 'readlinkf_posix: OLDPWD' [ "$OLDPWD" = /var ]
+variable_check 'readlinkf_posix: PWD' [ "$PWD" = /dev ]
+variable_check 'readlinkf_posix: OLDPWD' [ "$OLDPWD" = /bin ]
 variable_check 'readlinkf_posix: CDPATH' [ "$CDPATH" = /usr ]
 
 echo "-------------------------------- Cleanup -------------------------------"
@@ -169,6 +174,6 @@ run rm -rf "/RLF-LOOP2"
 run rm -rf "/RLF-MISSING"
 run rm -rf "/RLF-ROOT"
 run rm -rf "/RLF-SPACE INCLUDED"
-run tree -C -N --noreport -I "*[a-z]*" /
+run tree -C -N --noreport -I "*[a-z]*" / ||:
 
 exit $ex
