@@ -4,11 +4,19 @@ POSIX compliant `readlink -f` implementation for POSIX shell scripts.
 
 **Status: Refactoring towards v1.1.0 release**
 
-Short code version has been temporarily removed. See [v1.0.0](https://github.com/ko1nksm/readlinkf/releases/tag/v1.0.0) if you need it.
+## Why?
+
+There are many implementation alternatives to `readlink -f` ([\[1\]][1], [\[2\]][2], [\[3\]][3]). Most of them probably work, but It has some edge case bugs, unresolved issues, no tests, poor performance, long code, bashism, non-POSIX compliant and license problem. This feature is important to access files on relative paths from the main script. I couldn't find any reliable code despite of.
+
+[1]: https://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
+[2]: https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
+[3]: https://stackoverflow.com/questions/4774054/reliable-way-for-a-bash-script-to-get-the-full-path-to-itself
 
 ## readlinkf
 
 Source code: [readlinkf.sh](readlinkf.sh)
+
+Short code version has been temporarily removed. See [v1.0.0](https://github.com/ko1nksm/readlinkf/releases/tag/v1.0.0) if you need it.
 
 ### Usage
 
