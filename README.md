@@ -34,6 +34,13 @@ If you want to change, modify `max_symlinks` variable in the function.
 
 This implementation uses `cd -P` and `ls -dl`.
 
+**How it works**: It parsing the output of `ls -dl` and resolve symbolic links.
+The format of `ls -dl` is specified in [POSIX](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html).
+
+> `ls -dl: "%s %u %s %s %u %s %s -> %s\n",`<br>
+> `<file mode>, <number of links>, <owner name>, <group name>,`<br>
+> ` <size>, <date and time>, <pathname of link>, <contents of link>`
+
 ### 2. readlinkf_readlink
 
 This implementation uses `cd -P` and `readlink` (without `-f`).
