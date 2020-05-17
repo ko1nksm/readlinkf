@@ -2,7 +2,7 @@
 
 POSIX compliant `readlink -f` implementation for POSIX shell scripts.
 
-**Status: Refactoring towards v1.1.0 release**
+**Status: Almost completed v1.1.0. It will be release soon**
 
 ## Why?
 
@@ -50,9 +50,9 @@ It is very rare case, therefore I chose performance and code simplicity.
 
 [![Test Results](https://img.shields.io/cirrus/github/ko1nksm/readlinkf/master?label=Test%20results&style=for-the-badge)](https://cirrus-ci.com/github/ko1nksm/readlinkf/master)
 
-
 Tested with `ash` (busybox), `bosh`, `bash`, `dash`, `ksh`, `mksh`, `posh`, `yash`, `zsh` on Debian.
-The tests are compared with the result of GNU `readlink -f` command.
+And tested on macOS, FreeBSD, Cygwin, Msys2 and Git BASH.
+The tests are compared with the result of GNU `readlink -f` (`greadlink`) command.
 
 If you want to test yourself, use `test.sh` script.
 Root privilege is required for edge case test around the root directory.
@@ -73,70 +73,6 @@ environment variable. Check `test.sh` script for what it do before running it.
 
 ```sh
 sudo ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh
-```
-
-## Supplementary information
-
-### `cd` command compatibility
-
-| [exit status] | ash | bash | bosh | dash | ksh | mksh | posh | yash | zsh |
-| ------------- | --- | ---- | ---- | ---- | --- | ---- | ---- | ---- | --- |
-| `cd  ""`      | 0   | 0    | 1    | 0    | 1   | 0    | 0    | 0    | 0   |
-| `cd -P ""`    | 0   | 1    | 1    | 0    | 1   | 1    | 1    | 1    | 0   |
-| `cd -L ""`    | 0   | 0    | 1    | 0    | 1   | 0    | 0    | 0    | 0   |
-
-### `readlink` command compatibility
-
-GNU coreutils
-
-```sh
-$ cd /tmp
-$ ln -s no-such-a-file symlink
-
-$ readlink symlink
-no-such-a-file # exit status: 0
-
-$ readlink -f symlink
-/tmp/no-such-a-file # exit status: 0
-
-$ cd /
-$ readlink -f /tmp/symlink
-/tmp/no-such-a-file # exit status: 0
-```
-
-busybox 1.31.1
-
-```sh
-$ cd /tmp
-$ ln -s no-such-a-file symlink
-
-# OK
-$ readlink symlink
-no-such-a-file # exit status: 0
-
-# BAD
-$ readlink -f symlink
-<none> # exit status: 1
-
-# BAD
-$ cd /
-$ readlink -f /tmp/symlink
-/tmp/symlink # exit status: 0
-```
-
-macOS
-
-```sh
-$ cd /tmp
-$ ln -s no-such-a-file symlink
-
-# OK
-$ readlink symlink
-no-such-a-file # exit status: 0
-
-# -f not implemented
-$ readlink -f symlink
-readlink: illegal option -- f # exit status: 1
 ```
 
 ## Changelog
