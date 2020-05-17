@@ -6,7 +6,12 @@ POSIX compliant `readlink -f` implementation for POSIX shell scripts.
 
 ## Why?
 
-The `readlink` and the `realpath` commands are not specified POSIX and some environments may not be installed. There are many implementation alternatives to `readlink -f` ([\[1\]][1], [\[2\]][2], [\[3\]][3]). Most of them probably work, but It has some edge case bugs, unresolved issues, no tests, poor performance, long code, bashism, non-POSIX compliant and license problem. This feature is important to access files on relative paths from the main script. I couldn't find any reliable code despite of.
+The `readlink` and the `realpath` commands are not specified POSIX and some environments may not be installed.
+There are many implementation alternatives to `readlink -f` ([\[1\]][1], [\[2\]][2], [\[3\]][3]).
+Some of them probably work, but It has some edge case bugs, unresolved issues,
+no tests, poor performance, long code, bashism, non-POSIX compliant and license problem.
+This feature is important to access files on relative paths from the main script.
+I couldn't find any reliable code despite of.
 
 [1]: https://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
 [2]: https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
@@ -46,7 +51,8 @@ ls -dl: "%s %u %s %s %u %s %s -> %s\n",
 
 The format of `ls -dl` is specified in [POSIX](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html).
 
-> If the file is a symbolic link and the -L option is not specified, this information shall be about the link itself and the `<pathname>` field shall be of the form:
+> If the file is a symbolic link and the -L option is not specified, this
+> information shall be about the link itself and the `<pathname>` field shall be of the form:
 >
 > `"%s -> %s", <pathname of link>, <contents of link>`
 
