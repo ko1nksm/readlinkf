@@ -113,13 +113,11 @@ tests() {
   return "$ex"
 }
 
-readlink_native() {
-  if type greadlink >/dev/null 2>&1; then
-    $(which greadlink) "$@"
-  else
-    $(which readlink) "$@"
-  fi
-}
+if type greadlink >/dev/null 2>&1; then
+  readlink_native() { greadlink "$@"; }
+else
+  readlink_native() { readlink "$@"; }
+fi
 
 compare_with_readlink() {
   # shellcheck disable=SC2230
