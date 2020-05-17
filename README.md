@@ -34,7 +34,9 @@ If you want to change, modify `max_symlinks` variable in the function.
 
 This implementation uses `cd -P` and `ls -dl`.
 
-**How it works**: It parsing the output of `ls -dl` and resolve symbolic links.
+#### How it works
+
+It parsing the output of `ls -dl` and resolve symbolic links.
 
 ```sh
 ls -dl: "%s %u %s %s %u %s %s -> %s\n",
