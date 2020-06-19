@@ -2,8 +2,6 @@
 
 POSIX compliant `readlink -f` implementation for POSIX shell scripts.
 
-**Status: Almost completed v1.1.0. It will be release soon**
-
 ## Why?
 
 The `readlink` and the `realpath` commands are not specified POSIX and some environments may not be installed.
@@ -102,7 +100,7 @@ sudo ALLOW_CREATION_TO_THE_ROOT_DIRECTORY=1 ./test.sh
 ## Changelog
 
 - v1.0.0: 2020-05-13 Short code version
-- Unreleased: Friendly version
+- v1.1.0: 2020-06-20: Friendly version
 
 ## License
 
