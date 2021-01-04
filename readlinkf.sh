@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # POSIX compliant version
-readlinkf_posix() {
+readlinkf_posix() (
   [ "${1:-}" ] || return 1
   max_symlinks=40
   CDPATH='' # to avoid changing to an unexpected directory
@@ -34,10 +34,10 @@ readlinkf_posix() {
     target=${link#*" $target -> "}
   done
   return 1
-}
+)
 
 # readlink version
-readlinkf_readlink() {
+readlinkf_readlink() (
   [ "${1:-}" ] || return 1
   max_symlinks=40
   CDPATH='' # to avoid changing to an unexpected directory
@@ -65,7 +65,7 @@ readlinkf_readlink() {
     target=$(readlink -- "$target" 2>/dev/null) || break
   done
   return 1
-}
+)
 
 # Run as a command is an example.
 case ${0##*/} in (readlinkf_posix | readlinkf_readlink)

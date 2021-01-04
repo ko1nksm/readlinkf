@@ -24,11 +24,7 @@ Short code version has been temporarily removed. See [v1.0.0](https://github.com
 ### Usage
 
   1. `varname=$(readlinkf_* "<path>")` (assign to variable)
-  2. `(readlinkf_* "<path>")` (output to stdout)
-  3. `readlinkf_* "<path>"` (output to stdout, not recommended)
-
-Note: Usage 1 and 2 use subshells and therefore have no side effects. It does
-not change the current directory and any variables. Usage 3 has side effects.
+  2. `readlinkf_* "<path>"` (output to stdout)
 
 The maximum depth of symbolic links is 40. This value is the same as defined in Linux kernel 5.6. (See [MAXSYMLINKS](MAXSYMLINKS))
 However, `readlink -f` has not limitation. If you want to change, modify `max_symlinks` variable in these function.
